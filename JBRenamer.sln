@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JBRenamer", "JBRenamer\JBRenamer.csproj", "{60211191-1887-4A4E-8A5F-C8F6A78C6088}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60211191-1887-4A4E-8A5F-C8F6A78C6088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60211191-1887-4A4E-8A5F-C8F6A78C6088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60211191-1887-4A4E-8A5F-C8F6A78C6088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60211191-1887-4A4E-8A5F-C8F6A78C6088}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
