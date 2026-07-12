@@ -1,11 +1,15 @@
+using Qt.Bridge.Models;
+
 namespace JBRenamer;
 
-public class File
+public class File : IDisplayable
 {
-    private Uri source;
+    public Uri source;
 
     public File(Uri source)
     {
         this.source = source;
     }
+
+    public object DisplayValue => source.AbsolutePath;
 }

@@ -20,7 +20,10 @@ ApplicationWindow {
         fileMode: FileDialog.OpenFiles
         options: FileDialog.DontResolveSymlinks | FileDialog.HideNameFilterDetails
         onAccepted: {
-            files.AddSourceFile(selectedFile);
+            files.addSourceFile(selectedFile);
+            Qt.callLater(function() {
+                fileTable.forceLayout()
+            })
         }
     }
 
@@ -30,7 +33,9 @@ ApplicationWindow {
             
             Action {
                 text: "Add Source File(s)"
-                onTriggered: addSourceFileDialog.open()
+                onTriggered: {
+                    addSourceFileDialog.open()
+                }
             }
             Action {
                 text: qsTr("&Quit")
@@ -45,6 +50,12 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
+        HorizontalHeaderView {
+            Layout.row: 1
+            Layout.column: 1
+            Layout.fillWidth: true
+            syncView: fileTable
+        }
         TableView {
             id: fileTable
             model: files
@@ -52,6 +63,11 @@ ApplicationWindow {
             Layout.fillHeight: true
             selectionBehavior: TableView.SelectRows
             selectionMode: TableView.ExtendedSelection
+            delegate: TableViewDelegate {
+                implicitHeight: 40
+                implicitWidth: 9 * mainWindow.width / 20
+                leftPadding: 10; topPadding: 10
+            }
         }
     }
 }
