@@ -61,12 +61,18 @@ ApplicationWindow {
             model: files
             Layout.fillWidth: true
             Layout.fillHeight: true
+            alternatingRows: true
+            columnSpacing: 2
             selectionBehavior: TableView.SelectRows
             selectionMode: TableView.ExtendedSelection
+            editTriggers: TableView.NoEditTriggers
             delegate: TableViewDelegate {
                 implicitHeight: 40
                 implicitWidth: 9 * mainWindow.width / 20
                 leftPadding: 10; topPadding: 10
+            }
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AlwaysOn
             }
         }
     }
