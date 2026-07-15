@@ -7,13 +7,17 @@ ApplicationWindow {
     id: mainWindow
     visible: true
     title: "JBRenamer"
-    width: 640 
+    width: 640
     height: 480
-    
+
     FilesModel {
         id: files
     }
-    
+
+    RulesModel {
+        id: rules
+    }
+
     FileDialog {
         id: addSourceFileDialog
         acceptLabel: "Add Source File(s)"
@@ -30,7 +34,7 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
-            
+
             Action {
                 text: "Add Source File(s)"
                 onTriggered: {
@@ -44,49 +48,91 @@ ApplicationWindow {
             }
         }
     }
-    ColumnLayout {
-        anchors.fill: parent;
-        Rectangle {
-            color: "darkseagreen"
+    SplitView {
+        anchors.fill: parent
+        orientation: Qt.Vertical
+
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-        }
-        DropArea {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            
-            onDropped: function(drop) {
-                files.drop(drop.formats, drop.text, drop.urls)
-                Qt.callLater(function() {
-                    fileTable.forceLayout()
-                })
+
+            HorizontalHeaderView {
+                syncView: rulesTable
+                Layout.row: 1
+                Layout.column: 1
+                Layout.fillWidth: true
+                delegate: HorizontalHeaderViewDelegate {
+                    padding: 5
+                }
+            }
+            TableView {
+                id: rulesTable
+                model: rules
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                alternatingRows: true
+                columnSpacing: 2
+                delegate: TableViewDelegate {
+                    implicitWidth: 1 * mainWindow.width / 3
+                    padding: 5
+                }
+
+                selectionBehavior: TableView.SelectRows
+                selectionMode: TableView.ExtendedSelection
+                editTriggers: TableView.NoEditTriggers
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AlwaysOn
+                }
             }
 
-            ColumnLayout {
-                anchors.fill: parent
 
-                HorizontalHeaderView {
-                    Layout.row: 1
-                    Layout.column: 1
-                    Layout.fillWidth: true
-                    syncView: fileTable
+            DropArea {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                onDropped: function(drop) {
+                    // Both DragEvent text and urls properties appear to be seperated lists
+                    // with text using newline, while urls uses comma
+                    // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
+                    // So .text is used
+                    files.drop(drop.formats, drop.text)
+                    Qt.callLater(function() {
+                        fileTable.forceLayout()
+                    })
                 }
-                TableView {
-                    id: fileTable
-                    model: files
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    alternatingRows: true
-                    columnSpacing: 2
-                    selectionBehavior: TableView.SelectRows
-                    selectionMode: TableView.ExtendedSelection
-                    editTriggers: TableView.NoEditTriggers
-                    delegate: TableViewDelegate {
-                        implicitWidth: 9 * mainWindow.width / 20
-                        padding: 5
+
+                ColumnLayout {
+                    anchors.fill: parent
+
+                    HorizontalHeaderView {
+                        syncView: fileTable
+                        Layout.row: 1
+                        Layout.column: 1
+                        Layout.fillWidth: true
+                        delegate: HorizontalHeaderViewDelegate {
+                            padding: 5
+                        }
                     }
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
+                    TableView {
+                        id: fileTable
+                        model: files
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        alternatingRows: true
+                        columnSpacing: 2
+                        delegate: TableViewDelegate {
+                            implicitWidth: 9 * mainWindow.width / 20
+                            padding: 5
+                        }
+
+                        selectionBehavior: TableView.SelectRows
+                        selectionMode: TableView.ExtendedSelection
+                        editTriggers: TableView.NoEditTriggers
+                        ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                        }
                     }
                 }
             }

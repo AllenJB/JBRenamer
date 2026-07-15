@@ -69,11 +69,10 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Total files: " + files.Count);
     }
 
-    public void Drop(string source, string items, string urls)
+    public void Drop(string source, string items)
     {
         Debug.WriteLine("Drop source: " + source);
         Debug.WriteLine("Items: " + items);
-        Debug.WriteLine("URLs: " + urls);
 
         string[] uriStrings = items.Split("\n", StringSplitOptions.RemoveEmptyEntries);
         List<Uri> uris = [];
@@ -81,6 +80,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         {
             if (!uri.StartsWith("file://"))
             {
+                // TODO Notify user when drop item is rejected?
                 Debug.WriteLine("Ignored URI: " + uri);
                 continue;
             }
