@@ -56,6 +56,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             Debug.WriteLine("Add file URI: " + selectedFile.AbsolutePath);
             files.Add(new File(selectedFile));
         }
+
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Total files: " + files.Count);
     }
@@ -66,5 +67,27 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         files.Add(new File(selectedFile));
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Total files: " + files.Count);
+    }
+
+    public void Drop(string source, string items, string urls)
+    {
+        Debug.WriteLine("Drop source: " + source);
+        Debug.WriteLine("Items: " + items);
+        Debug.WriteLine("URLs: " + urls);
+
+        string[] uriStrings = items.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+        List<Uri> uris = [];
+        foreach (string uri in uriStrings)
+        {
+            if (!uri.StartsWith("file://"))
+            {
+                Debug.WriteLine("Ignored URI: " + uri);
+                continue;
+            }
+
+            uris.Add(new Uri(uri));
+        }
+
+        AddSourceFiles(uris);
     }
 }

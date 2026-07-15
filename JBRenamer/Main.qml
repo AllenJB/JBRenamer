@@ -34,6 +34,7 @@ ApplicationWindow {
             Action {
                 text: "Add Source File(s)"
                 onTriggered: {
+                    console.log("test")
                     addSourceFileDialog.open()
                 }
             }
@@ -50,29 +51,44 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
-        HorizontalHeaderView {
-            Layout.row: 1
-            Layout.column: 1
-            Layout.fillWidth: true
-            syncView: fileTable
-        }
-        TableView {
-            id: fileTable
-            model: files
+        DropArea {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            alternatingRows: true
-            columnSpacing: 2
-            selectionBehavior: TableView.SelectRows
-            selectionMode: TableView.ExtendedSelection
-            editTriggers: TableView.NoEditTriggers
-            delegate: TableViewDelegate {
-                implicitHeight: 40
-                implicitWidth: 9 * mainWindow.width / 20
-                leftPadding: 10; topPadding: 10
+            
+            onDropped: function(drop) {
+                files.drop(drop.formats, drop.text, drop.urls)
+                Qt.callLater(function() {
+                    fileTable.forceLayout()
+                })
             }
-            ScrollBar.vertical: ScrollBar {
-                policy: ScrollBar.AlwaysOn
+
+            ColumnLayout {
+                anchors.fill: parent
+
+                HorizontalHeaderView {
+                    Layout.row: 1
+                    Layout.column: 1
+                    Layout.fillWidth: true
+                    syncView: fileTable
+                }
+                TableView {
+                    id: fileTable
+                    model: files
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    alternatingRows: true
+                    columnSpacing: 2
+                    selectionBehavior: TableView.SelectRows
+                    selectionMode: TableView.ExtendedSelection
+                    editTriggers: TableView.NoEditTriggers
+                    delegate: TableViewDelegate {
+                        implicitWidth: 9 * mainWindow.width / 20
+                        padding: 5
+                    }
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AlwaysOn
+                    }
+                }
             }
         }
     }
