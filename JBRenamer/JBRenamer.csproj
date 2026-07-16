@@ -36,6 +36,7 @@
         <Compile Include="RulesModel.cs" />
         <Compile Include="Rules\ReplaceRule.cs" />
         <None Include="Main.qml"/>
+        <None Include="Rules/*.qml" />
         <Compile Include="Program.cs"/>
     </ItemGroup>
 </Project>

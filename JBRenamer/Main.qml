@@ -7,8 +7,8 @@ ApplicationWindow {
     id: mainWindow
     visible: true
     title: "JBRenamer"
-    width: 640
-    height: 480
+    width: 800
+    height: 600
 
     FilesModel {
         id: files
@@ -38,7 +38,6 @@ ApplicationWindow {
             Action {
                 text: "Add Source File(s)"
                 onTriggered: {
-                    console.log("test")
                     addSourceFileDialog.open()
                 }
             }
@@ -47,7 +46,23 @@ ApplicationWindow {
                 onTriggered: mainWindow.close()
             }
         }
+        
+        Menu {
+            title: "Rules"
+            
+            Action {
+                text: "Add Rule"
+                onTriggered: {
+                    ruleAddDialog.open()
+                }
+            }
+        }
     }
+    
+    RuleAddDialog {
+        id: ruleAddDialog
+    }
+    
     SplitView {
         anchors.fill: parent
         orientation: Qt.Vertical
