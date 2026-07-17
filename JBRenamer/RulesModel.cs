@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JBRenamer.Rules;
 using Qt.Bridge.Models;
 
@@ -47,5 +48,16 @@ public class RulesModel :TableModel<string>
             return null;
         }
         set => throw new InvalidOperationException();
+    }
+
+    public void Add(Rule rule)
+    {
+        rules.Add(rule);
+        Debug.WriteLine("Total rules: " + rules.Count);
+    }
+
+    public void AddReplaceRule(string find, string replace)
+    {
+        Add(new ReplaceRule(find, replace));
     }
 }

@@ -17,6 +17,10 @@ ApplicationWindow {
     RulesModel {
         id: rules
     }
+    
+    DebugModel {
+        id: debug
+    }
 
     FileDialog {
         id: addSourceFileDialog

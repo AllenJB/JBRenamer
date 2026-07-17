@@ -3,8 +3,30 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-Rectangle {
-    Text {
-        text: "Replace rule config"
+RuleConfig {
+    GridLayout {
+        columns: 2
+        rowSpacing: 5
+        columnSpacing: 5
+
+        Label {
+            text: "Find:"
+        }
+        TextField {
+            id: replaceConfigFindText
+            Layout.fillWidth: true
+        }
+        Label {
+            text: "Replace with:"
+        }
+        TextField {
+            id: replaceConfigReplaceText
+            Layout.fillWidth: true
+        }
+    }
+    
+    onSaveRule: function() {
+        debug.log("saveRule() replace")
+        rules.addReplaceRule(replaceConfigFindText.text, replaceConfigReplaceText.text)
     }
 }

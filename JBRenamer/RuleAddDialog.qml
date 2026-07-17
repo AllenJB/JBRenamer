@@ -14,6 +14,11 @@ Dialog {
     closePolicy: Popup.CloseOnEscape
     standardButtons: Dialog.Ok | Dialog.Cancel
     
+    onAccepted: function() {
+        ruleConfig.children[ruleConfig.currentIndex].saveRule()
+        rulesTable.forceLayout()
+    }
+    
     width: 640
     height: 480
     
@@ -30,7 +35,7 @@ Dialog {
                 height: ruleTypeSelectItemText.height
                 Text {
                     id: ruleTypeSelectItemText
-                    font.bold: index == ruleConfig.currentIndex
+                    font.bold: index === ruleConfig.currentIndex
                     padding: 5
 
                     text: name + " @ " + index
@@ -66,9 +71,7 @@ Dialog {
             id: ruleConfig
             currentIndex: 0
 
-            Rectangle {
-                color: "teal"
-
+            Rules.RuleConfig {
                 Text {
                     text: "Select a rule type"
                 }

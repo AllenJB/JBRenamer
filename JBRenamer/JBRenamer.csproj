@@ -30,6 +30,7 @@
     </Target>
 
     <ItemGroup>
+        <Compile Include="DebugModel.cs" />
         <Compile Include="File.cs" />
         <Compile Include="FilesModel.cs" />
         <Compile Include="Rule.cs" />
