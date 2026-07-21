@@ -1,7 +1,7 @@
 ﻿import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs;
+import QtQuick.Dialogs
 
 ApplicationWindow {
     id: mainWindow
@@ -21,6 +21,24 @@ ApplicationWindow {
     DebugModel {
         id: debug
     }
+    
+    signal fileListUpdated()
+    signal ruleListUpdated()
+    
+    onFileListUpdated: function() {
+        files.runRules(rules);
+        Qt.callLater(function() {
+            fileTable.forceLayout();
+        })
+    }
+    
+    onRuleListUpdated: function() {
+        files.runRules(rules);
+        Qt.callLater(function() {
+            fileTable.forceLayout();
+            rulesTable.forceLayout();
+        })
+    }
 
     FileDialog {
         id: addSourceFileDialog
@@ -29,9 +47,7 @@ ApplicationWindow {
         options: FileDialog.DontResolveSymlinks | FileDialog.HideNameFilterDetails
         onAccepted: {
             files.addSourceFile(selectedFile);
-            Qt.callLater(function() {
-                fileTable.forceLayout()
-            })
+            mainWindow.fileListUpdated();
         }
     }
 
@@ -115,10 +131,8 @@ ApplicationWindow {
                     // with text using newline, while urls uses comma
                     // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
                     // So .text is used
-                    files.drop(drop.formats, drop.text)
-                    Qt.callLater(function() {
-                        fileTable.forceLayout()
-                    })
+                    files.drop(drop.formats, drop.text);
+                    mainWindow.fileListUpdated();
                 }
 
                 ColumnLayout {

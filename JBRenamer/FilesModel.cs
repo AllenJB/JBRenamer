@@ -1,21 +1,21 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using Qt.Bridge.Models;
-using Qt.Quick;
 
 namespace JBRenamer;
 
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    
+
     private List<string> Headers { get; } =
     [
         "Original Filename",
         "New Filename",
     ];
 
-    private List<File> files = [
+    private List<File> files =
+    [
         new File(new Uri("/etc/passwd"))
     ];
 
@@ -39,9 +39,9 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             {
                 case 0:
                     return file.source.AbsolutePath;
-                
+
                 case 1:
-                    return "TODO";
+                    return file.destination.AbsolutePath;
             }
 
             return null;
@@ -51,7 +51,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public void AddSourceFiles(List<Uri> selectedFiles)
     {
-        foreach(Uri selectedFile in selectedFiles)
+        foreach (Uri selectedFile in selectedFiles)
         {
             Debug.WriteLine("Add file URI: " + selectedFile.AbsolutePath);
             files.Add(new File(selectedFile));
@@ -89,5 +89,16 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
 
         AddSourceFiles(uris);
+    }
+
+    public void RunRules(RulesModel rulesModel)
+    {
+        Debug.WriteLine("Running rules");
+        foreach (File file in files)
+        {
+            file.RunRules(rulesModel);
+        }
+        PropertyChanged?.Invoke(this, new(nameof(files)));
+        Debug.WriteLine("Running rules complete");
     }
 }

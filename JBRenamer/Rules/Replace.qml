@@ -26,7 +26,7 @@ RuleConfig {
     }
     
     onSaveRule: function() {
-        debug.log("saveRule() replace")
-        rules.addReplaceRule(replaceConfigFindText.text, replaceConfigReplaceText.text)
+        debug.log("saveRule() replace");
+        rules.addReplaceRule(replaceConfigFindText.text, replaceConfigReplaceText.text);
     }
 }

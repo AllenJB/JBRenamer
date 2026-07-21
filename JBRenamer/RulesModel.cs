@@ -4,7 +4,7 @@ using Qt.Bridge.Models;
 
 namespace JBRenamer;
 
-public class RulesModel :TableModel<string>
+public class RulesModel : TableModel<string>
 {
     private List<string> Headers { get; } =
     [
@@ -13,7 +13,8 @@ public class RulesModel :TableModel<string>
         "Description",
     ];
 
-    private List<Rule> rules = [
+    public List<Rule> rules { get; } =
+    [
         new ReplaceRule("TestSearch", "TestReplace")
     ];
 
@@ -37,10 +38,10 @@ public class RulesModel :TableModel<string>
             {
                 case 0:
                     return "" + row;
-                
+
                 case 1:
                     return rule.RuleType;
-                
+
                 case 2:
                     return rule.Describe();
             }

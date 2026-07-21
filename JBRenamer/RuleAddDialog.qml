@@ -15,8 +15,8 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     
     onAccepted: function() {
-        ruleConfig.children[ruleConfig.currentIndex].saveRule()
-        rulesTable.forceLayout()
+        ruleConfig.children[ruleConfig.currentIndex].saveRule();
+        mainWindow.ruleListUpdated();
     }
     
     width: 640

@@ -14,7 +14,7 @@ public class ReplaceRule : Rule
 
     public override Uri Run(Uri sourceUri)
     {
-        return new Uri(sourceUri.PathAndQuery.Replace(search, replace));
+        return new Uri(sourceUri.AbsolutePath.Replace(search, replace));
     }
 
     public override string Describe()
