@@ -94,9 +94,12 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public void RunRules(RulesModel rulesModel)
     {
         Debug.WriteLine("Running rules");
+        var i = -1;
         foreach (File file in files)
         {
+            i++;
             file.RunRules(rulesModel);
+            DataChanged(i, 1);
         }
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Running rules complete");
