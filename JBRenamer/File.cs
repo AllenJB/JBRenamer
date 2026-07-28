@@ -3,11 +3,22 @@ using Qt.Bridge.Models;
 
 namespace JBRenamer;
 
+public enum FileStatus
+{
+    Ready,
+    Error,
+    Renamed,
+}
+
 public class File : IDisplayable
 {
     public Uri source { get; init; }
 
     public Uri destination { get; private set; }
+
+    public FileStatus status = FileStatus.Ready;
+
+    public string? error = null;
 
     public File(Uri source)
     {

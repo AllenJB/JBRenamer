@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using Qt.Bridge.Models;
+using FileStatus = JBRenamer.FileStatus;
+using Filesystem = System.IO.File; 
 
 namespace JBRenamer;
 
@@ -12,12 +14,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     [
         "Original Filename",
         "New Filename",
+        "Status",
+        "Error Message",
     ];
 
-    private List<File> files =
-    [
-        new File(new Uri("/etc/passwd"))
-    ];
+    private List<File> files = [];
 
     protected override int Rows => files.Count;
 
@@ -42,6 +43,12 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
                 case 1:
                     return file.destination.AbsolutePath;
+                
+                case 2:
+                    return file.status.ToString("G");
+                
+                case 3:
+                    return (file.error ?? string.Empty);
             }
 
             return null;
@@ -65,6 +72,25 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     {
         Debug.WriteLine("Add file URI: " + selectedFile.AbsolutePath);
         files.Add(new File(selectedFile));
+        PropertyChanged?.Invoke(this, new(nameof(files)));
+        Debug.WriteLine("Total files: " + files.Count);
+    }
+
+    public void AddSourceDirectory(Uri selectedFile)
+    {
+        Debug.WriteLine("Add URI: " + selectedFile.AbsolutePath);
+        DirectoryInfo srcPath = new DirectoryInfo(selectedFile.AbsolutePath);
+        if (! srcPath.Exists)
+        {
+            Debug.WriteLine("Selected URI is not a directory");
+            return;
+        }
+
+        foreach (FileInfo file in srcPath.GetFiles())
+        {
+            files.Add(new File(new Uri(file.FullName)));
+        }
+        
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Total files: " + files.Count);
     }
@@ -103,5 +129,40 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Running rules complete");
+    }
+
+    public void RenameFiles(RulesModel rules)
+    {
+        Debug.WriteLine("Renaming files");
+        var i = -1;
+        foreach (File file in files)
+        {
+            i++;
+            if (file.status != FileStatus.Ready)
+            {
+                continue;
+            }
+
+            try
+            {
+                Filesystem.Move(file.source.AbsolutePath, file.destination.AbsolutePath);
+                file.status = FileStatus.Renamed;
+            }
+            catch (FileNotFoundException e)
+            {
+                Debug.WriteLine("ERROR " + file.source.AbsoluteUri + " FNF: " + e.Message);
+                file.status = FileStatus.Error;
+                file.error = "Source file not found";
+            }
+            catch (IOException e)
+            {
+                Debug.WriteLine("ERROR " + file.source.AbsoluteUri + " IO: " + e.Message);
+                file.status = FileStatus.Error;
+                file.error = e.Message;
+            }
+            DataChanged(i, 1);
+        }
+        PropertyChanged?.Invoke(this, new(nameof(files)));
+        Debug.WriteLine("Rename complete");
     }
 }

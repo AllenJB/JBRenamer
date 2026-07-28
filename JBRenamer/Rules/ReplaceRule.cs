@@ -14,7 +14,10 @@ public class ReplaceRule : Rule
 
     public override Uri Run(Uri sourceUri)
     {
-        return new Uri(sourceUri.AbsolutePath.Replace(search, replace));
+        FileInfo file = new FileInfo(sourceUri.AbsolutePath);
+        string path = (file.DirectoryName ?? string.Empty);
+        string fileName = file.Name.Replace(search, replace);
+        return new Uri(path + Path.DirectorySeparatorChar + fileName);
     }
 
     public override string Describe()

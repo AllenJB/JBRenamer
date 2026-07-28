@@ -51,6 +51,16 @@ ApplicationWindow {
         }
     }
 
+    FolderDialog {
+        id: addSourceDirDialog
+        acceptLabel: "Add Source Files From Directory"
+        options: FolderDialog.DontResolveSymlinks
+        onAccepted: {
+            files.addSourceDirectory(selectedFolder);
+            mainWindow.fileListUpdated();
+        }
+    }
+
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
@@ -59,6 +69,19 @@ ApplicationWindow {
                 text: "Add Source File(s)"
                 onTriggered: {
                     addSourceFileDialog.open()
+                }
+            }
+            Action {
+                text: "Add Source Files From Directory"
+                onTriggered: {
+                    addSourceDirDialog.open()
+                }
+            }
+            Action {
+                text: "Rename files"
+                onTriggered: {
+                    files.renameFiles(rules);
+                    fileListUpdated();
                 }
             }
             Action {
@@ -90,6 +113,7 @@ ApplicationWindow {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            id: rulesTableContainer
 
             HorizontalHeaderView {
                 syncView: rulesTable
@@ -111,6 +135,22 @@ ApplicationWindow {
                 delegate: TableViewDelegate {
                     implicitWidth: 1 * mainWindow.width / 3
                     padding: 5
+                }
+
+                property var columnWidths: [50, 100, rulesTableContainer.width]
+                columnWidthProvider: function(column) {
+                    let w = explicitColumnWidth(column)
+                    if (w >= 0 && column !== (columns - 1)) {
+                        columnWidths[column] = w;
+                        return w;
+                    }
+                    if (column === (columns - 1)) {
+                        w =  columnWidths[column];
+                        let i = columns - 1;
+                        while(--i !== -1) w -= columnWidths[i];
+                        return w;
+                    }
+                    return columnWidths[column];
                 }
 
                 selectionBehavior: TableView.SelectRows
@@ -137,6 +177,7 @@ ApplicationWindow {
 
                 ColumnLayout {
                     anchors.fill: parent
+                    id: fileTableContainer
 
                     HorizontalHeaderView {
                         syncView: fileTable
@@ -158,6 +199,22 @@ ApplicationWindow {
                         delegate: TableViewDelegate {
                             implicitWidth: 9 * mainWindow.width / 20
                             padding: 5
+                        }
+
+                        property var columnWidths: [300, 300, 75, fileTableContainer.width]
+                        columnWidthProvider: function(column) {
+                            let w = explicitColumnWidth(column)
+                            if (w >= 0 && column !== (columns - 1)) {
+                                columnWidths[column] = w;
+                                return w;
+                            }
+                            if (column === (columns - 1)) {
+                                w =  columnWidths[column];
+                                let i = columns - 1;
+                                while(--i !== -1) w -= columnWidths[i];
+                                return w;
+                            }
+                            return columnWidths[column];
                         }
 
                         selectionBehavior: TableView.SelectRows
