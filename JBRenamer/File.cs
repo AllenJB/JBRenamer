@@ -12,7 +12,9 @@ public enum FileStatus
 
 public class File : IDisplayable
 {
-    public Uri source { get; init; }
+    public string source { get; init; }
+
+    private FileInfo sourceFile;
 
     public string destination { get; private set; }
 
@@ -20,17 +22,18 @@ public class File : IDisplayable
 
     public string? error = null;
 
-    public File(Uri source)
+    public File(string sourcePath)
     {
-        this.source = source;
-        destination = source.AbsolutePath;
+        this.source = sourcePath;
+        this.sourceFile = new FileInfo(this.source);
+        destination = sourcePath;
     }
 
-    public object DisplayValue => source.AbsolutePath;
+    public object DisplayValue => source;
     
     public void RunRules(RulesModel rulesModel)
     {
-        string newUri = source.AbsolutePath;
+        string newUri = source;
         foreach (Rule rule in rulesModel.rules)
         {
             newUri = rule.Run(newUri);

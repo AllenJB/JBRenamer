@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Web;
 using Qt.Bridge.Models;
 using FileStatus = JBRenamer.FileStatus;
 using Filesystem = System.IO.File; 
@@ -39,7 +40,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             switch (col)
             {
                 case 0:
-                    return file.source.AbsolutePath;
+                    return file.source;
 
                 case 1:
                     return file.destination;
@@ -56,12 +57,24 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         set => throw new InvalidOperationException();
     }
 
+    protected string DecodeUri(string original)
+    {
+        string protocol = "file://";
+        string uri = HttpUtility.UrlDecode(original);
+        if (uri.StartsWith(protocol))
+        {
+            uri = uri.Substring(protocol.Length);
+        }
+
+        return uri;
+    }
+
     public void AddSourceFiles(List<Uri> selectedFiles)
     {
         foreach (Uri selectedFile in selectedFiles)
         {
-            Debug.WriteLine("Add file URI: " + selectedFile.AbsolutePath);
-            files.Add(new File(selectedFile));
+            Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
+            files.Add(new File(selectedFile.LocalPath));
         }
 
         PropertyChanged?.Invoke(this, new(nameof(files)));
@@ -70,16 +83,16 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public void AddSourceFile(Uri selectedFile)
     {
-        Debug.WriteLine("Add file URI: " + selectedFile.AbsolutePath);
-        files.Add(new File(selectedFile));
+        Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
+        files.Add(new File(selectedFile.LocalPath));
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Total files: " + files.Count);
     }
 
-    public void AddSourceDirectory(Uri selectedFile)
+    public void AddSourceDirectory(Uri selectedPath)
     {
-        Debug.WriteLine("Add URI: " + selectedFile.AbsolutePath);
-        DirectoryInfo srcPath = new DirectoryInfo(selectedFile.AbsolutePath);
+        Debug.WriteLine("Add URI: " + selectedPath.LocalPath);
+        DirectoryInfo srcPath = new DirectoryInfo(selectedPath.LocalPath);
         if (! srcPath.Exists)
         {
             Debug.WriteLine("Selected URI is not a directory");
@@ -88,7 +101,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
         foreach (FileInfo file in srcPath.GetFiles())
         {
-            files.Add(new File(new Uri(file.FullName)));
+            files.Add(new File(file.FullName));
         }
         
         PropertyChanged?.Invoke(this, new(nameof(files)));
@@ -145,18 +158,18 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
             try
             {
-                Filesystem.Move(file.source.AbsolutePath, file.destination);
+                Filesystem.Move(file.source, file.destination);
                 file.status = FileStatus.Renamed;
             }
             catch (FileNotFoundException e)
             {
-                Debug.WriteLine("ERROR " + file.source.AbsoluteUri + " FNF: " + e.Message);
+                Debug.WriteLine("ERROR " + file.source + " FNF: " + e.Message);
                 file.status = FileStatus.Error;
                 file.error = "Source file not found";
             }
             catch (IOException e)
             {
-                Debug.WriteLine("ERROR " + file.source.AbsoluteUri + " IO: " + e.Message);
+                Debug.WriteLine("ERROR " + file.source + " IO: " + e.Message);
                 file.status = FileStatus.Error;
                 file.error = e.Message;
             }
