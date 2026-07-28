@@ -161,6 +161,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 file.error = e.Message;
             }
             DataChanged(i, 1);
+            DataChanged(i, 2);
+            DataChanged(i, 3);
         }
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Rename complete");
