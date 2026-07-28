@@ -14,7 +14,7 @@ public class File : IDisplayable
 {
     public Uri source { get; init; }
 
-    public Uri destination { get; private set; }
+    public string destination { get; private set; }
 
     public FileStatus status = FileStatus.Ready;
 
@@ -23,14 +23,14 @@ public class File : IDisplayable
     public File(Uri source)
     {
         this.source = source;
-        destination = new Uri(source.AbsolutePath);
+        destination = source.AbsolutePath;
     }
 
     public object DisplayValue => source.AbsolutePath;
     
     public void RunRules(RulesModel rulesModel)
     {
-        Uri newUri = new Uri(source.AbsolutePath);
+        string newUri = source.AbsolutePath;
         foreach (Rule rule in rulesModel.rules)
         {
             newUri = rule.Run(newUri);

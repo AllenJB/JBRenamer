@@ -4,7 +4,7 @@ public abstract class Rule
 {
     public string RuleType { get; private set; }
     
-    public abstract Uri Run(Uri sourceUri);
+    public abstract string Run(string sourceUri);
 
     public abstract string Describe();
 

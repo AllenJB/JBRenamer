@@ -12,12 +12,12 @@ public class ReplaceRule : Rule
         this.replace = replace;
     }
 
-    public override Uri Run(Uri sourceUri)
+    public override string Run(string sourceUri)
     {
-        FileInfo file = new FileInfo(sourceUri.AbsolutePath);
+        FileInfo file = new FileInfo(sourceUri);
         string path = (file.DirectoryName ?? string.Empty);
         string fileName = file.Name.Replace(search, replace);
-        return new Uri(path + Path.DirectorySeparatorChar + fileName);
+        return path + Path.DirectorySeparatorChar + fileName;
     }
 
     public override string Describe()

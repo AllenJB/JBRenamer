@@ -42,7 +42,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                     return file.source.AbsolutePath;
 
                 case 1:
-                    return file.destination.AbsolutePath;
+                    return file.destination;
                 
                 case 2:
                     return file.status.ToString("G");
@@ -145,7 +145,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
             try
             {
-                Filesystem.Move(file.source.AbsolutePath, file.destination.AbsolutePath);
+                Filesystem.Move(file.source.AbsolutePath, file.destination);
                 file.status = FileStatus.Renamed;
             }
             catch (FileNotFoundException e)
