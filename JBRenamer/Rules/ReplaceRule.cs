@@ -16,8 +16,11 @@ public class ReplaceRule : Rule
     {
         FileInfo file = new FileInfo(sourceUri);
         string path = (file.DirectoryName ?? string.Empty);
-        string fileName = file.Name.Replace(Search, Replace);
-        return path + Path.DirectorySeparatorChar + fileName;
+        string extension = file.Extension;
+        string fileNameNoExt = file.Name.Substring(0, file.Name.Length-(extension.Length));
+
+        fileNameNoExt = fileNameNoExt.Replace(Search, Replace);
+        return path + Path.DirectorySeparatorChar + fileNameNoExt + extension;
     }
 
     public override string Describe()

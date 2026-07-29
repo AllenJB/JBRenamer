@@ -18,7 +18,7 @@ public class ReplaceRuleTest
             ("a.txt", "b.txt"),
             ("AA.txt", "AA.txt"),
             ("aa.txt", "bb.txt"),
-            ("test.a", "test.b"),
+            ("test.a", "test.a"),
         };
 
         foreach ((string input, string expectedOutput) in ios)
