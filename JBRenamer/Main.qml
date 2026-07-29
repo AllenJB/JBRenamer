@@ -85,6 +85,13 @@ ApplicationWindow {
                 }
             }
             Action {
+                text: "Clear File List"
+                onTriggered: {
+                    files.clear();
+                    fileListUpdated();
+                }
+            }
+            Action {
                 text: qsTr("&Quit")
                 onTriggered: mainWindow.close()
             }

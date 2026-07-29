@@ -180,4 +180,10 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new(nameof(files)));
         Debug.WriteLine("Rename complete");
     }
+
+    public void Clear()
+    {
+        files.Clear();
+        PropertyChanged?.Invoke(this, new(nameof(files)));
+    }
 }
