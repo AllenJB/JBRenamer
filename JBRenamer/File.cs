@@ -12,34 +12,34 @@ public enum FileStatus
 
 public class File : IDisplayable
 {
-    public string source { get; init; }
+    public string Source { get; init; }
 
-    private FileInfo sourceFile;
+    private FileInfo SourceFile;
 
-    public string destination { get; private set; }
+    public string Destination { get; private set; }
 
-    public FileStatus status = FileStatus.Ready;
+    public FileStatus Status = FileStatus.Ready;
 
-    public string? error = null;
+    public string? Error = null;
 
     public File(string sourcePath)
     {
-        this.source = sourcePath;
-        this.sourceFile = new FileInfo(this.source);
-        destination = sourcePath;
+        this.Source = sourcePath;
+        this.SourceFile = new FileInfo(this.Source);
+        Destination = sourcePath;
     }
 
-    public object DisplayValue => source;
+    public object DisplayValue => Source;
     
     public void RunRules(RulesModel rulesModel)
     {
-        string newUri = source;
-        foreach (Rule rule in rulesModel.rules)
+        string newUri = Source;
+        foreach (Rule rule in rulesModel.Rules)
         {
             newUri = rule.Run(newUri);
         }
 
-        destination = newUri;
-        Debug.WriteLine("New destination: " + destination);
+        Destination = newUri;
+        Debug.WriteLine("New destination: " + Destination);
     }
 }

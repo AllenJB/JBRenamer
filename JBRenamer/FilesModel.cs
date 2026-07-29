@@ -19,9 +19,9 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         "Error Message",
     ];
 
-    private List<File> files = [];
+    private List<File> Files = [];
 
-    protected override int Rows => files.Count;
+    protected override int Rows => Files.Count;
 
     protected override int Columns => Headers.Count;
 
@@ -31,28 +31,15 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     {
         get
         {
-            if (row < 0 || row >= files.Count)
+            File file = Files[row];
+            return col switch
             {
-                return null;
-            }
-
-            File file = files[row];
-            switch (col)
-            {
-                case 0:
-                    return file.source;
-
-                case 1:
-                    return file.destination;
-                
-                case 2:
-                    return file.status.ToString("G");
-                
-                case 3:
-                    return (file.error ?? string.Empty);
-            }
-
-            return null;
+                0 => file.Source,
+                1 => file.Destination,
+                2 => file.Status.ToString("G"),
+                3 => (file.Error ?? string.Empty),
+                _ => throw new InvalidOperationException(),
+            };
         }
         set => throw new InvalidOperationException();
     }
@@ -74,19 +61,19 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         foreach (Uri selectedFile in selectedFiles)
         {
             Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-            files.Add(new File(selectedFile.LocalPath));
+            Files.Add(new File(selectedFile.LocalPath));
         }
 
-        PropertyChanged?.Invoke(this, new(nameof(files)));
-        Debug.WriteLine("Total files: " + files.Count);
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
+        Debug.WriteLine("Total files: " + Files.Count);
     }
 
     public void AddSourceFile(Uri selectedFile)
     {
         Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-        files.Add(new File(selectedFile.LocalPath));
-        PropertyChanged?.Invoke(this, new(nameof(files)));
-        Debug.WriteLine("Total files: " + files.Count);
+        Files.Add(new File(selectedFile.LocalPath));
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
+        Debug.WriteLine("Total files: " + Files.Count);
     }
 
     public void AddSourceDirectory(Uri selectedPath)
@@ -101,11 +88,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
         foreach (FileInfo file in srcPath.GetFiles())
         {
-            files.Add(new File(file.FullName));
+            Files.Add(new File(file.FullName));
         }
         
-        PropertyChanged?.Invoke(this, new(nameof(files)));
-        Debug.WriteLine("Total files: " + files.Count);
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
+        Debug.WriteLine("Total files: " + Files.Count);
     }
 
     public void Drop(string source, string items)
@@ -134,13 +121,13 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     {
         Debug.WriteLine("Running rules");
         var i = -1;
-        foreach (File file in files)
+        foreach (File file in Files)
         {
             i++;
             file.RunRules(rulesModel);
             DataChanged(i, 1);
         }
-        PropertyChanged?.Invoke(this, new(nameof(files)));
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Running rules complete");
     }
 
@@ -148,42 +135,42 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     {
         Debug.WriteLine("Renaming files");
         var i = -1;
-        foreach (File file in files)
+        foreach (File file in Files)
         {
             i++;
-            if (file.status != FileStatus.Ready)
+            if (file.Status != FileStatus.Ready)
             {
                 continue;
             }
 
             try
             {
-                Filesystem.Move(file.source, file.destination);
-                file.status = FileStatus.Renamed;
+                Filesystem.Move(file.Source, file.Destination);
+                file.Status = FileStatus.Renamed;
             }
             catch (FileNotFoundException e)
             {
-                Debug.WriteLine("ERROR " + file.source + " FNF: " + e.Message);
-                file.status = FileStatus.Error;
-                file.error = "Source file not found";
+                Debug.WriteLine("ERROR " + file.Source + " FNF: " + e.Message);
+                file.Status = FileStatus.Error;
+                file.Error = "Source file not found";
             }
             catch (IOException e)
             {
-                Debug.WriteLine("ERROR " + file.source + " IO: " + e.Message);
-                file.status = FileStatus.Error;
-                file.error = e.Message;
+                Debug.WriteLine("ERROR " + file.Source + " IO: " + e.Message);
+                file.Status = FileStatus.Error;
+                file.Error = e.Message;
             }
             DataChanged(i, 1);
             DataChanged(i, 2);
             DataChanged(i, 3);
         }
-        PropertyChanged?.Invoke(this, new(nameof(files)));
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Rename complete");
     }
 
     public void Clear()
     {
-        files.Clear();
-        PropertyChanged?.Invoke(this, new(nameof(files)));
+        Files.Clear();
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
     }
 }

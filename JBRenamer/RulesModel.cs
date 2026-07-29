@@ -13,12 +13,12 @@ public class RulesModel : TableModel<string>
         "Description",
     ];
 
-    public List<Rule> rules { get; } =
+    public List<Rule> Rules { get; } =
     [
         new ReplaceRule("TestSearch", "TestReplace")
     ];
 
-    protected override int Rows => rules.Count;
+    protected override int Rows => Rules.Count;
 
     protected override int Columns => Headers.Count;
 
@@ -28,33 +28,22 @@ public class RulesModel : TableModel<string>
     {
         get
         {
-            if (row < 0 || row >= rules.Count)
+            Rule rule = Rules[row];
+            return col switch
             {
-                return null;
-            }
-
-            Rule rule = rules[row];
-            switch (col)
-            {
-                case 0:
-                    return "" + row;
-
-                case 1:
-                    return rule.RuleType;
-
-                case 2:
-                    return rule.Describe();
-            }
-
-            return null;
+                0 => "" + row,
+                1 => rule.RuleType,
+                2 => rule.Describe(),
+                _ => throw new InvalidOperationException(),
+            };
         }
         set => throw new InvalidOperationException();
     }
 
     public void Add(Rule rule)
     {
-        rules.Add(rule);
-        Debug.WriteLine("Total rules: " + rules.Count);
+        Rules.Add(rule);
+        Debug.WriteLine("Total rules: " + Rules.Count);
     }
 
     public void AddReplaceRule(string find, string replace)
