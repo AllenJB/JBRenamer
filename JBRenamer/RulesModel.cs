@@ -13,10 +13,7 @@ public class RulesModel : TableModel<string>
         "Description",
     ];
 
-    public List<Rule> Rules { get; } =
-    [
-        new ReplaceRule("TestSearch", "TestReplace")
-    ];
+    public List<Rule> Rules { get; } = [];
 
     protected override int Rows => Rules.Count;
 
@@ -49,5 +46,10 @@ public class RulesModel : TableModel<string>
     public void AddReplaceRule(string find, string replace)
     {
         Add(new ReplaceRule(find, replace));
+    }
+
+    public void AddRegExpRule(string findPattern, string replace)
+    {
+        Add(new RegExpRule(findPattern, replace));
     }
 }

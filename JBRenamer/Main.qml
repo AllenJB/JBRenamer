@@ -9,6 +9,10 @@ ApplicationWindow {
     title: "JBRenamer"
     width: 800
     height: 600
+    
+    Program {
+        id: program
+    }
 
     FilesModel {
         id: files

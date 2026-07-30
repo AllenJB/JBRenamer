@@ -38,7 +38,7 @@ Dialog {
                     font.bold: index === ruleConfig.currentIndex
                     padding: 5
 
-                    text: name + " @ " + index
+                    text: name
                 }
                 onClicked: ruleConfig.currentIndex = index
             }
@@ -57,12 +57,12 @@ Dialog {
             
             model: ListModel {
                 ListElement {
-                    name: "None"
-                    index: 0
-                }
-                ListElement {
                     name: "Replace"
                     index: 1
+                }
+                ListElement {
+                    name: "Regular Expression"
+                    index: 2
                 }
             }
         }
@@ -77,6 +77,7 @@ Dialog {
                 }
             }
             Rules.Replace {}
+            Rules.RegExp {}
         }
     }
 }
