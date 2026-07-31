@@ -44,6 +44,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         set => throw new InvalidOperationException();
     }
 
+    public int Count()
+    {
+        return Files.Count;
+    }
+
     protected string DecodeUri(string original)
     {
         string protocol = "file://";

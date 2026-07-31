@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
 // The ../ is required here because thats how the files end up laid out in the bin/Debug/net10.0/ directory

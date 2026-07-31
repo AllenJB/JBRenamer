@@ -1,5 +1,5 @@
 ﻿import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
@@ -34,6 +34,8 @@ ApplicationWindow {
         Qt.callLater(function() {
             fileTable.forceLayout();
         })
+        
+        dropFilesLabel.visible = (files.count() == 0);
     }
     
     onRuleListUpdated: function() {
@@ -235,6 +237,16 @@ ApplicationWindow {
                             policy: ScrollBar.AlwaysOn
                         }
                     }
+                }
+                Text {
+                    id: dropFilesLabel
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: "Drag your files here"
+                    color: "#000066"
+                    font.pixelSize: 24
+                    font.weight: Font.DemiBold
                 }
             }
         }
