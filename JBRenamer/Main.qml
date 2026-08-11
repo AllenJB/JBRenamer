@@ -217,6 +217,9 @@ ApplicationWindow {
                                     contentItem: Label {
                                         padding: 5
                                         color: {
+                                            // Trick the engine into making this link to displayed value changes
+                                            console.log(newNameDelegate.model.display);
+
                                             if (files.destinationConflicts(newNameDelegate.row)) {
                                                 return "red";
                                             }
