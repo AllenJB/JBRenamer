@@ -73,12 +73,14 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Total files: " + Files.Count);
     }
 
-    public void AddSourceFile(Uri selectedFile)
+    public File AddSourceFile(Uri selectedFile)
     {
         Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-        Files.Add(new File(selectedFile.LocalPath));
+        File file = new File(selectedFile.LocalPath);
+        Files.Add(file);
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Total files: " + Files.Count);
+        return file;
     }
 
     public void AddSourceDirectory(Uri selectedPath)
