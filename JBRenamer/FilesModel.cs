@@ -139,7 +139,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         {
             i++;
             file.RunRules(rulesModel);
-            DataChanged(i, 1);
+
+            DataChanged(i, Headers.IndexOf("New Name"));
+            DataChanged(i, Headers.IndexOf("New Full Path"));
+            DataChanged(i, Headers.IndexOf("Status"));
+            DataChanged(i, Headers.IndexOf("Error Message"));
         }
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Running rules complete");
@@ -167,8 +171,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                     fileA.Error = "Destination conflicts with another file";
                     Debug.WriteLine($"{fileA.Source} ({indexA}) conflicts with {fileB.Source} ({indexB})");
 
-                    DataChanged(indexA, 2);
-                    DataChanged(indexA, 3);
+                    DataChanged(indexA, Headers.IndexOf("Status"));
+                    DataChanged(indexA, Headers.IndexOf("Error Message"));
                 }
             }
 
@@ -178,8 +182,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 fileA.Status = FileStatus.Ready;
                 fileA.Error = null;
 
-                DataChanged(indexA, 2);
-                DataChanged(indexA, 3);
+                DataChanged(indexA, Headers.IndexOf("Status"));
+                DataChanged(indexA, Headers.IndexOf("Error Message"));
             }
         }
     }
@@ -213,9 +217,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 file.Status = FileStatus.Error;
                 file.Error = e.Message;
             }
-            DataChanged(i, 1);
-            DataChanged(i, 2);
-            DataChanged(i, 3);
+
+            DataChanged(i, Headers.IndexOf("New Name"));
+            DataChanged(i, Headers.IndexOf("New Full Path"));
+            DataChanged(i, Headers.IndexOf("Status"));
+            DataChanged(i, Headers.IndexOf("Error Message"));
         }
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Rename complete");
