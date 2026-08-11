@@ -209,8 +209,32 @@ ApplicationWindow {
 
                         alternatingRows: true
                         columnSpacing: 2
-                        delegate: TableViewDelegate {
-                            padding: 5
+                        delegate: DelegateChooser {
+                            DelegateChoice {
+                                column: files.columnIndex("New Name")
+                                delegate: TableViewDelegate {
+                                    id: newNameDelegate
+                                    contentItem: Label {
+                                        padding: 5
+                                        color: {
+                                            if (files.destinationConflicts(newNameDelegate.row)) {
+                                                return "red";
+                                            }
+                                            if (files.destinationChanged(newNameDelegate.row)) {
+                                                return "blue";
+                                            }
+                                        
+                                            return "green";
+                                        }
+                                        text: (newNameDelegate.model.display ?? "")
+                                    }
+                                }
+                            }
+                            DelegateChoice {
+                                delegate: TableViewDelegate {
+                                    padding: 5
+                                }
+                            }
                         }
 
                         property var columnWidths: {
@@ -228,7 +252,7 @@ ApplicationWindow {
                             if (w >= 0) {
                                 columnWidths[columnName] = w;
                             }
-                            debug.log("Column width for " + columnName + " = " + columnWidths[columnName]);
+                            // debug.log("Column width for " + columnName + " = " + columnWidths[columnName]);
                             return columnWidths[columnName];
                         }
 

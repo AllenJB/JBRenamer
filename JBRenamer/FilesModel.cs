@@ -31,6 +31,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public string ColumnName(int column) => Headers[column];
 
+    public int ColumnIndex(string columnName) => Headers.IndexOf(columnName);
+
     protected override string this[int row, int col]
     {
         get
@@ -54,6 +56,17 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public int Count()
     {
         return Files.Count;
+    }
+
+    public bool DestinationChanged(int index)
+    {
+        Debug.WriteLine("Checking destination changed for "+ index);
+        return (Files[index].Destination != Files[index].Source);
+    }
+
+    public bool DestinationConflicts(int index)
+    {
+        return (Files[index].Status == FileStatus.Conflict);
     }
 
     protected string DecodeUri(string original)
