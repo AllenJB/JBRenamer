@@ -39,7 +39,9 @@ public class File : IDisplayable
             newUri = rule.Run(newUri);
         }
 
-        Destination = newUri;
+        FileInfo newDest = new FileInfo(newUri);
+
+        Destination = newDest.FullName;
         Debug.WriteLine("New destination: " + Destination);
     }
 }
