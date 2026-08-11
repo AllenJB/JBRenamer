@@ -6,6 +6,7 @@ namespace JBRenamer;
 public enum FileStatus
 {
     Ready,
+    Conflict,
     Error,
     Renamed,
 }

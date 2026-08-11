@@ -136,6 +136,45 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Running rules complete");
+        
+        RunConflictCheck();
+    }
+    
+    private void RunConflictCheck()
+    {
+        var indexA = -1;
+        foreach (File fileA in Files)
+        {
+            indexA++;
+            
+            bool hasConflict = false;
+            var indexB = -1;
+            foreach (File fileB in Files)
+            {
+                indexB++;
+                
+                if ((fileA != fileB) && (fileA.Destination == fileB.Destination))
+                {
+                    hasConflict = true;
+                    fileA.Status = FileStatus.Conflict;
+                    fileA.Error = "Destination conflicts with another file";
+                    Debug.WriteLine($"{fileA.Source} ({indexA}) conflicts with {fileB.Source} ({indexB})");
+
+                    DataChanged(indexA, 2);
+                    DataChanged(indexA, 3);
+                }
+            }
+
+            if ((!hasConflict) && (fileA.Status == FileStatus.Conflict))
+            {
+                Debug.WriteLine($"{fileA.Source} ({indexA}) has no conflicts");
+                fileA.Status = FileStatus.Ready;
+                fileA.Error = null;
+
+                DataChanged(indexA, 2);
+                DataChanged(indexA, 3);
+            }
+        }
     }
 
     public void RenameFiles(RulesModel rules)
