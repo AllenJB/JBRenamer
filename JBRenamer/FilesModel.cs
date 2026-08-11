@@ -11,10 +11,12 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private List<string> Headers { get; } =
+    public List<string> Headers { get; } =
     [
-        "Original Filename",
-        "New Filename",
+        "Original Full Path",
+        "Original Name",
+        "New Name",
+        "New Full Path",
         "Status",
         "Error Message",
     ];
@@ -27,17 +29,22 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     protected override string ColumnHeader(int column) => Headers[column];
 
+    public string ColumnName(int column) => Headers[column];
+
     protected override string this[int row, int col]
     {
         get
         {
             File file = Files[row];
-            return col switch
+            string columnName = (Headers[col] ?? "");
+            return columnName switch
             {
-                0 => file.Source,
-                1 => file.Destination,
-                2 => file.Status.ToString("G"),
-                3 => (file.Error ?? string.Empty),
+                "Original Full Path" => file.Source,
+                "Original Name" => file.SourceFile.Name,
+                "New Name" => file.DestinationFile.Name,
+                "New Full Path" => file.Destination,
+                "Status" => file.Status.ToString("G"),
+                "Error Message" => (file.Error ?? string.Empty),
                 _ => throw new InvalidOperationException(),
             };
         }
@@ -93,7 +100,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             return;
         }
 
-        foreach (FileInfo file in srcPath.GetFiles())
+        foreach (FileSystemInfo file in srcPath.GetFileSystemInfos())
         {
             Files.Add(new File(file.FullName));
         }

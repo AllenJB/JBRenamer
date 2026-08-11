@@ -15,9 +15,11 @@ public class File : IDisplayable
 {
     public string Source { get; init; }
 
-    private FileInfo SourceFile;
+    public FileSystemInfo SourceFile { get; private set; }
 
     public string Destination { get; private set; }
+    
+    public FileSystemInfo DestinationFile { get; private set; }
 
     public FileStatus Status = FileStatus.Ready;
 
@@ -25,9 +27,10 @@ public class File : IDisplayable
 
     public File(string sourcePath)
     {
-        this.Source = sourcePath;
-        this.SourceFile = new FileInfo(this.Source);
+        Source = sourcePath;
+        SourceFile = new FileInfo(Source);
         Destination = sourcePath;
+        DestinationFile = new FileInfo(Destination);
     }
 
     public object DisplayValue => Source;
@@ -43,6 +46,7 @@ public class File : IDisplayable
         FileInfo newDest = new FileInfo(newUri);
 
         Destination = newDest.FullName;
+        DestinationFile = new FileInfo(Destination);
         Debug.WriteLine("New destination: " + Destination);
     }
 }

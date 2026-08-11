@@ -210,30 +210,35 @@ ApplicationWindow {
                         alternatingRows: true
                         columnSpacing: 2
                         delegate: TableViewDelegate {
-                            implicitWidth: 9 * mainWindow.width / 20
                             padding: 5
                         }
 
-                        property var columnWidths: [300, 300, 75, fileTableContainer.width]
-                        columnWidthProvider: function(column) {
-                            let w = explicitColumnWidth(column)
-                            if (w >= 0 && column !== (columns - 1)) {
-                                columnWidths[column] = w;
-                                return w;
+                        property var columnWidths: {
+                            "Original Full Path": 500,
+                            "Original Name": 250,
+                            "New Name": 250,
+                            "New Full Path": 500,
+                            "Status": 75,
+                            "Error Message": 250,
+                        }
+                        columnWidthProvider: function (column) {
+                            let columnName = files.columnName(column);
+
+                            let w = explicitColumnWidth(column);
+                            if (w >= 0) {
+                                columnWidths[columnName] = w;
                             }
-                            if (column === (columns - 1)) {
-                                w =  columnWidths[column];
-                                let i = columns - 1;
-                                while(--i !== -1) w -= columnWidths[i];
-                                return w;
-                            }
-                            return columnWidths[column];
+                            debug.log("Column width for " + columnName + " = " + columnWidths[columnName]);
+                            return columnWidths[columnName];
                         }
 
                         selectionBehavior: TableView.SelectRows
                         selectionMode: TableView.ExtendedSelection
                         editTriggers: TableView.NoEditTriggers
                         ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                        }
+                        ScrollBar.horizontal: ScrollBar {
                             policy: ScrollBar.AlwaysOn
                         }
                     }
