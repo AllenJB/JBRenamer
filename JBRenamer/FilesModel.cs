@@ -5,11 +5,13 @@ using System.Web;
 using Qt.Bridge.Models;
 using Testably.Abstractions;
 
+[assembly: Qt.IgnoreType(typeof(IFileSystem))]
+[assembly: Qt.IgnoreType(typeof(IFileSystemInfo))]
+
 namespace JBRenamer;
 
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
-    [Qt.Ignore]
     private IFileSystem Filesystem = new RealFileSystem();
     
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -36,7 +38,6 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public int ColumnIndex(string columnName) => Headers.IndexOf(columnName);
 
-    [Qt.Ignore]
     public void SetFilesystem(IFileSystem fsImpl)
     {
         Filesystem = fsImpl;

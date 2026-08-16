@@ -14,24 +14,20 @@ public enum FileStatus
 
 public class File : IDisplayable
 {
-    [Qt.Ignore]
     private readonly IFileSystem Filesystem;
 
     public string Source { get; init; }
 
-    [Qt.Ignore]
     public IFileSystemInfo SourceFile { get; private set; }
 
     public string Destination { get; private set; }
     
-    [Qt.Ignore]
     public IFileSystemInfo DestinationFile { get; private set; }
 
     public FileStatus Status = FileStatus.Ready;
 
     public string? Error = null;
 
-    [Qt.Ignore]
     public File(IFileSystemInfo sourceInfo, IFileSystem fs)
     {
         Filesystem = fs;
