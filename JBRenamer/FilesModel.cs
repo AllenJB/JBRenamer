@@ -10,11 +10,23 @@ using Testably.Abstractions;
 
 namespace JBRenamer;
 
+public class ShowErrorArgs : EventArgs
+{
+    public string Message { get; set; }
+
+    public ShowErrorArgs(string message)
+    {
+        this.Message = message;
+    }
+}
+
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
     private IFileSystem Filesystem = new RealFileSystem();
     
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event EventHandler<ShowErrorArgs> ShowError;
 
     public List<string> Headers { get; } =
     [
@@ -106,44 +118,67 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public void AddSourceFiles(List<Uri> selectedFiles)
     {
-        foreach (Uri selectedFile in selectedFiles)
+        try
         {
-            Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
-            // FIXME Display error when file/directory not found (probably fun with special chars similar to trailing spaces)
-            Files.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
-        }
+            foreach (Uri selectedFile in selectedFiles)
+            {
+                Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
+                // FIXME Display error when file/directory not found (probably fun with special chars similar to trailing spaces)
+                Files.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
+            }
 
-        PropertyChanged?.Invoke(this, new(nameof(Files)));
-        Debug.WriteLine("Total files: " + Files.Count);
+            PropertyChanged?.Invoke(this, new(nameof(Files)));
+            Debug.WriteLine("Total files: " + Files.Count);
+        }
+        catch (Exception e)
+        {
+            ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
+        }
     }
 
-    public File AddSourceFile(Uri selectedFile)
+    public File? AddSourceFile(Uri selectedFile)
     {
         Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-        File file = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
-        Files.Add(file);
-        PropertyChanged?.Invoke(this, new(nameof(Files)));
-        Debug.WriteLine("Total files: " + Files.Count);
-        return file;
+        try
+        {
+            File file = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
+            Files.Add(file);
+            PropertyChanged?.Invoke(this, new(nameof(Files)));
+            Debug.WriteLine("Total files: " + Files.Count);
+            return file;
+        }
+        catch (InvalidOperationException e)
+        {
+            ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
+        }
+
+        return null;
     }
 
     public void AddSourceDirectory(Uri selectedPath)
     {
         Debug.WriteLine("Add URI: " + selectedPath.LocalPath);
-        IDirectoryInfo srcPath = Filesystem.DirectoryInfo.New(selectedPath.LocalPath);
-        if (! srcPath.Exists)
+        try
         {
-            Debug.WriteLine("Selected URI is not a directory");
-            return;
-        }
+            IDirectoryInfo srcPath = Filesystem.DirectoryInfo.New(selectedPath.LocalPath);
+            if (!srcPath.Exists)
+            {
+                Debug.WriteLine("Selected URI is not a directory");
+                return;
+            }
 
-        foreach (IFileSystemInfo file in srcPath.GetFileSystemInfos())
-        {
-            Files.Add(new File(file, Filesystem));
+            foreach (IFileSystemInfo file in srcPath.GetFileSystemInfos())
+            {
+                Files.Add(new File(file, Filesystem));
+            }
+
+            PropertyChanged?.Invoke(this, new(nameof(Files)));
+            Debug.WriteLine("Total files: " + Files.Count);
         }
-        
-        PropertyChanged?.Invoke(this, new(nameof(Files)));
-        Debug.WriteLine("Total files: " + Files.Count);
+        catch (Exception e)
+        {
+            ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
+        }
     }
 
     public void Drop(string source, string items)

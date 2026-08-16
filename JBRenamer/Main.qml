@@ -26,6 +26,29 @@ ApplicationWindow {
         id: debug
     }
     
+    Connections {
+        target: files
+        function onShowError(args) {
+            popupError.message = args.message;
+            popupError.open();
+        }
+    }
+    
+    Dialog {
+        id: popupError
+        property string message
+        title: "Error!"
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape
+        standardButtons: Dialog.Ok
+        Text {
+            Layout.alignment: Qt.AlignCenter
+            text: popupError.message
+        }
+    }
+    
     signal fileListUpdated()
     signal ruleListUpdated()
     
@@ -52,7 +75,12 @@ ApplicationWindow {
         fileMode: FileDialog.OpenFiles
         options: FileDialog.DontResolveSymlinks | FileDialog.HideNameFilterDetails
         onAccepted: {
-            files.addSourceFile(selectedFile);
+            try {
+                files.addSourceFile(selectedFile);
+            } catch (e) {
+                console.log("Xception:", e);
+                Debug.log("Exception: "+ e);
+            }
             mainWindow.fileListUpdated();
         }
     }
@@ -224,10 +252,10 @@ ApplicationWindow {
                                                 return "red";
                                             }
                                             if (files.destinationChanged(newNameDelegate.row)) {
-                                                return "blue";
+                                                return "darkblue";
                                             }
                                         
-                                            return "green";
+                                            return "darkgray";
                                         }
                                         text: (newNameDelegate.model.display ?? "")
                                     }
