@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Abstractions;
 using Qt.Bridge.Models;
 
 namespace JBRenamer;
@@ -13,24 +14,31 @@ public enum FileStatus
 
 public class File : IDisplayable
 {
+    [Qt.Ignore]
+    private readonly IFileSystem Filesystem;
+
     public string Source { get; init; }
 
-    public FileSystemInfo SourceFile { get; private set; }
+    [Qt.Ignore]
+    public IFileSystemInfo SourceFile { get; private set; }
 
     public string Destination { get; private set; }
     
-    public FileSystemInfo DestinationFile { get; private set; }
+    [Qt.Ignore]
+    public IFileSystemInfo DestinationFile { get; private set; }
 
     public FileStatus Status = FileStatus.Ready;
 
     public string? Error = null;
 
-    public File(string sourcePath)
+    [Qt.Ignore]
+    public File(IFileSystemInfo sourceInfo, IFileSystem fs)
     {
-        Source = sourcePath;
-        SourceFile = new FileInfo(Source);
-        Destination = sourcePath;
-        DestinationFile = new FileInfo(Destination);
+        Filesystem = fs;
+        Source = sourceInfo.FullName;
+        Destination = sourceInfo.FullName;
+        SourceFile = sourceInfo;
+        DestinationFile = sourceInfo;
     }
 
     public object DisplayValue => Source;
@@ -43,10 +51,21 @@ public class File : IDisplayable
             newUri = rule.Run(newUri);
         }
 
-        FileInfo newDest = new FileInfo(newUri);
+        IFileSystemInfo newDest;
+        if (SourceFile is IFileInfo)
+        {
+            newDest = Filesystem.FileInfo.New(newUri);
+        } else if (SourceFile is IDirectoryInfo)
+        {
+            newDest = Filesystem.DirectoryInfo.New(newUri);
+        }
+        else
+        {
+            throw new UnreachableException();
+        }
 
         Destination = newDest.FullName;
-        DestinationFile = new FileInfo(Destination);
+        DestinationFile = newDest;
         Debug.WriteLine("New destination: " + Destination);
     }
 }

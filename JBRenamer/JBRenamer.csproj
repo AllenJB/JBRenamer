@@ -41,4 +41,8 @@
         <None Include="Rules/*.qml" />
         <Compile Include="Program.cs"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Testably.Abstractions" Version="10.3.0" />
+    </ItemGroup>
 </Project>

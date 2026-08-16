@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Abstractions;
 using System.Web;
 using Qt.Bridge.Models;
-using FileStatus = JBRenamer.FileStatus;
-using Filesystem = System.IO.File; 
+using Testably.Abstractions;
 
 namespace JBRenamer;
 
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
+    [Qt.Ignore]
+    private IFileSystem Filesystem = new RealFileSystem();
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public List<string> Headers { get; } =
@@ -32,6 +35,12 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public string ColumnName(int column) => Headers[column];
 
     public int ColumnIndex(string columnName) => Headers.IndexOf(columnName);
+
+    [Qt.Ignore]
+    public void SetFilesystem(IFileSystem fsImpl)
+    {
+        Filesystem = fsImpl;
+    }
 
     protected override string this[int row, int col]
     {
@@ -81,12 +90,26 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         return uri;
     }
 
+    private IFileSystemInfo FSInfoFromPath(string path)
+    {
+        if (Filesystem.File.Exists(path))
+        {
+            return Filesystem.FileInfo.New(path);
+        } else if (Filesystem.Directory.Exists(path))
+        {
+            return Filesystem.DirectoryInfo.New(path);
+        }
+
+        throw new InvalidOperationException("Not a valid file or directory path: " + path);
+    }
+
     public void AddSourceFiles(List<Uri> selectedFiles)
     {
         foreach (Uri selectedFile in selectedFiles)
         {
-            Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-            Files.Add(new File(selectedFile.LocalPath));
+            Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
+            // FIXME Display error when file/directory not found (probably fun with special chars similar to trailing spaces)
+            Files.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
         }
 
         PropertyChanged?.Invoke(this, new(nameof(Files)));
@@ -96,7 +119,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public File AddSourceFile(Uri selectedFile)
     {
         Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
-        File file = new File(selectedFile.LocalPath);
+        File file = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
         Files.Add(file);
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Total files: " + Files.Count);
@@ -106,16 +129,16 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public void AddSourceDirectory(Uri selectedPath)
     {
         Debug.WriteLine("Add URI: " + selectedPath.LocalPath);
-        DirectoryInfo srcPath = new DirectoryInfo(selectedPath.LocalPath);
+        IDirectoryInfo srcPath = Filesystem.DirectoryInfo.New(selectedPath.LocalPath);
         if (! srcPath.Exists)
         {
             Debug.WriteLine("Selected URI is not a directory");
             return;
         }
 
-        foreach (FileSystemInfo file in srcPath.GetFileSystemInfos())
+        foreach (IFileSystemInfo file in srcPath.GetFileSystemInfos())
         {
-            Files.Add(new File(file.FullName));
+            Files.Add(new File(file, Filesystem));
         }
         
         PropertyChanged?.Invoke(this, new(nameof(Files)));
@@ -127,7 +150,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Drop source: " + source);
         Debug.WriteLine("Items: " + items);
 
-        string[] uriStrings = items.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+        char[] seperators = ['\n'];
+        string[] uriStrings = items.Split(seperators);
         List<Uri> uris = [];
         foreach (string uri in uriStrings)
         {
@@ -138,7 +162,9 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 continue;
             }
 
-            uris.Add(new Uri(uri));
+            string modifiedUri = uri.Replace(" ", "%20");
+            Debug.WriteLine("New URI: '" + modifiedUri + "'");
+            uris.Add(new Uri(modifiedUri));
         }
 
         AddSourceFiles(uris);
@@ -215,7 +241,15 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
             try
             {
-                Filesystem.Move(file.Source, file.Destination);
+                if (Filesystem.File.Exists(file.Source))
+                {
+                    Filesystem.File.Move(file.Source, file.Destination);
+                }
+                else if (Filesystem.Directory.Exists(file.Source))
+                {
+                    Filesystem.Directory.Move(file.Source, file.Destination);
+                }
+
                 file.Status = FileStatus.Renamed;
             }
             catch (FileNotFoundException e)
