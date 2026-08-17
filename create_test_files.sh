@@ -10,8 +10,20 @@ filenames=(
   'Filename with spaces.txt'
   'Filename%20with%20encoding-like.txt'
   'Filename+with+plus.txt'
+  'Filename with trailing space.txt '
+  'Filename without extension'
+)
+  
+dirnames=(
+  'Directory with spaces'
+  'Directory with trailing space '
+  'Directory.with.dots'
 )
 
 for file in "${filenames[@]}"; do
   touch "$file"
+done
+
+for dir in "${dirnames[@]}"; do
+  mkdir "$dir"
 done
