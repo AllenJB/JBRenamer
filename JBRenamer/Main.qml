@@ -9,7 +9,7 @@ ApplicationWindow {
     title: "JBRenamer"
     width: 800
     height: 600
-    
+
     Program {
         id: program
     }
@@ -21,19 +21,20 @@ ApplicationWindow {
     RulesModel {
         id: rules
     }
-    
+
     DebugModel {
         id: debug
     }
-    
+
     Connections {
         target: files
+
         function onShowError(args) {
             popupError.message = args.message;
             popupError.open();
         }
     }
-    
+
     Dialog {
         id: popupError
         property string message
@@ -48,19 +49,21 @@ ApplicationWindow {
             text: popupError.message
         }
     }
-    
+
     signal fileListUpdated()
+
     signal ruleListUpdated()
-    
-    onFileListUpdated: function() {
+
+    onFileListUpdated: function () {
         files.runRules(rules);
         filesView.fileListUpdated();
+        statusBar.fileListUpdated();
     }
-    
-    onRuleListUpdated: function() {
+
+    onRuleListUpdated: function () {
         files.runRules(rules);
         filesView.ruleListUpdated();
-        Qt.callLater(function() {
+        Qt.callLater(function () {
             rulesTable.forceLayout();
         })
     }
@@ -75,7 +78,7 @@ ApplicationWindow {
                 files.addSourceFile(selectedFile);
             } catch (e) {
                 console.log("Xception:", e);
-                Debug.log("Exception: "+ e);
+                Debug.log("Exception: " + e);
             }
             mainWindow.fileListUpdated();
         }
@@ -126,10 +129,10 @@ ApplicationWindow {
                 onTriggered: mainWindow.close()
             }
         }
-        
+
         Menu {
             title: "Rules"
-            
+
             Action {
                 text: "Add Rule"
                 onTriggered: {
@@ -138,11 +141,15 @@ ApplicationWindow {
             }
         }
     }
-    
+
+    footer: StatusBar {
+        id: statusBar
+    }
+
     RuleAddDialog {
         id: ruleAddDialog
     }
-    
+
     SplitView {
         id: listsContainer
         anchors.fill: parent
@@ -178,16 +185,16 @@ ApplicationWindow {
                 }
 
                 property var columnWidths: [50, 100, rulesTableContainer.width]
-                columnWidthProvider: function(column) {
+                columnWidthProvider: function (column) {
                     let w = explicitColumnWidth(column)
                     if (w >= 0 && column !== (columns - 1)) {
                         columnWidths[column] = w;
                         return w;
                     }
                     if (column === (columns - 1)) {
-                        w =  columnWidths[column];
+                        w = columnWidths[column];
                         let i = columns - 1;
-                        while(--i !== -1) w -= columnWidths[i];
+                        while (--i !== -1) w -= columnWidths[i];
                         return w;
                     }
                     return columnWidths[column];
