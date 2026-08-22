@@ -35,6 +35,7 @@
         <Compile Include="FilesModel.cs" />
         <Compile Include="Rule.cs" />
         <Compile Include="RulesModel.cs" />
+        <Compile Include="Rules\PrefixRule.cs" />
         <Compile Include="Rules\RegExpRule.cs" />
         <Compile Include="Rules\ReplaceRule.cs" />
         <None Include="Main.qml"/>

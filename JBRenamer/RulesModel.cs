@@ -52,4 +52,9 @@ public class RulesModel : TableModel<string>
     {
         Add(new RegExpRule(findPattern, replace));
     }
+
+    public void AddPrefixRule(string value)
+    {
+        Add(new PrefixRule(value));
+    }
 }

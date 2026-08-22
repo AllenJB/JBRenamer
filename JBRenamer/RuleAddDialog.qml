@@ -64,6 +64,10 @@ Dialog {
                     name: "Regular Expression"
                     index: 2
                 }
+                ListElement {
+                    name: "Prefix"
+                    index: 3
+                }
             }
         }
         
@@ -78,6 +82,7 @@ Dialog {
             }
             Rules.Replace {}
             Rules.RegExp {}
+            Rules.Prefix {}
         }
     }
 }
