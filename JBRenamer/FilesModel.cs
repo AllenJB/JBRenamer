@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Web;
 using Qt.Bridge.Models;
+using Qt.DotNet;
 using Testably.Abstractions;
 
 [assembly: Qt.IgnoreType(typeof(IFileSystem))]
@@ -116,24 +117,38 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         throw new InvalidOperationException("Not a valid file or directory path: " + path);
     }
 
+    private void AddFiles(List<File> newFiles)
+    {
+        int currentLastIndex = (Files.Count - 1);
+        BeginInsertRows(new ModelIndex(), currentLastIndex, currentLastIndex + newFiles.Count );
+        foreach (File newFile in newFiles)
+        {
+            Files.Add(newFile);
+        }
+        EndInsertRows();
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
+        Debug.WriteLine("Total files: " + Files.Count);
+    }
+
     public void AddSourceFiles(List<Uri> selectedFiles)
     {
+        List<File> newFiles = [];
         try
         {
             foreach (Uri selectedFile in selectedFiles)
             {
                 Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
-                // FIXME Display error when file/directory not found (probably fun with special chars similar to trailing spaces)
-                Files.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
+                // FIXME Display error when file/directory not found
+                // (probably fun with special chars similar to trailing spaces)
+                newFiles.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
             }
-
-            PropertyChanged?.Invoke(this, new(nameof(Files)));
-            Debug.WriteLine("Total files: " + Files.Count);
         }
         catch (Exception e)
         {
             ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
         }
+
+        AddFiles(newFiles);
     }
 
     public File? AddSourceFile(Uri selectedFile)
@@ -141,11 +156,9 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Add file URI: " + selectedFile.LocalPath);
         try
         {
-            File file = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
-            Files.Add(file);
-            PropertyChanged?.Invoke(this, new(nameof(Files)));
-            Debug.WriteLine("Total files: " + Files.Count);
-            return file;
+            File newFile = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
+            AddFiles([newFile]);
+            return newFile;
         }
         catch (InvalidOperationException e)
         {
@@ -158,22 +171,22 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public void AddSourceDirectory(Uri selectedPath)
     {
         Debug.WriteLine("Add URI: " + selectedPath.LocalPath);
+        List<File> newFiles = [];
         try
         {
             IDirectoryInfo srcPath = Filesystem.DirectoryInfo.New(selectedPath.LocalPath);
             if (!srcPath.Exists)
             {
-                Debug.WriteLine("Selected URI is not a directory");
+                ShowError?.Invoke(this, new ShowErrorArgs("Not a valid directory: " + selectedPath.LocalPath));
                 return;
             }
 
             foreach (IFileSystemInfo file in srcPath.GetFileSystemInfos())
             {
-                Files.Add(new File(file, Filesystem));
+                newFiles.Add(new File(file, Filesystem));
             }
 
-            PropertyChanged?.Invoke(this, new(nameof(Files)));
-            Debug.WriteLine("Total files: " + Files.Count);
+            AddFiles(newFiles);
         }
         catch (Exception e)
         {
