@@ -32,21 +32,14 @@ public class File : IDisplayable
     {
         Filesystem = fs;
         Source = sourceInfo.FullName;
-        Destination = sourceInfo.FullName;
         SourceFile = sourceInfo;
-        DestinationFile = sourceInfo;
+        SetDestination(Source);
     }
 
     public object DisplayValue => Source;
-    
-    public void RunRules(RulesModel rulesModel)
-    {
-        string newUri = Source;
-        foreach (Rule rule in rulesModel.Rules)
-        {
-            newUri = rule.Run(newUri);
-        }
 
+    private void SetDestination(string newUri)
+    {
         IFileSystemInfo newDest;
         if (SourceFile is IFileInfo)
         {
@@ -62,6 +55,23 @@ public class File : IDisplayable
 
         Destination = newDest.FullName;
         DestinationFile = newDest;
+        Status = FileStatus.Ready;
+    }
+    
+    public void RunRules(RulesModel rulesModel)
+    {
+        if (Status == FileStatus.Renamed)
+        {
+            return;
+        }
+
+        string newUri = Source;
+        foreach (Rule rule in rulesModel.Rules)
+        {
+            newUri = rule.Run(newUri);
+        }
+
+        SetDestination(newUri);
         Debug.WriteLine("New destination: " + Destination);
     }
 }
