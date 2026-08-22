@@ -144,13 +144,16 @@ ApplicationWindow {
     }
     
     SplitView {
+        id: listsContainer
         anchors.fill: parent
         orientation: Qt.Vertical
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             id: rulesTableContainer
+
+            Layout.fillWidth: true
+            SplitView.preferredHeight: (listsContainer.height / 2)
+            SplitView.minimumHeight: 100
 
             HorizontalHeaderView {
                 syncView: rulesTable
@@ -197,10 +200,14 @@ ApplicationWindow {
                     policy: ScrollBar.AlwaysOn
                 }
             }
+        }
 
-            FilesView {
-                id: filesView
-            }
+        FilesView {
+            id: filesView
+
+            Layout.fillWidth: true
+            SplitView.preferredHeight: (listsContainer.height / 2)
+            SplitView.minimumHeight: 100
         }
     }
 }
