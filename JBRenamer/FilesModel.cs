@@ -24,7 +24,7 @@ public class ShowErrorArgs : EventArgs
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
     private IFileSystem Filesystem = new RealFileSystem();
-    
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler<ShowErrorArgs> ShowError;
@@ -83,7 +83,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public bool DestinationChanged(int index)
     {
-        Debug.WriteLine("Checking destination changed for "+ index);
+        Debug.WriteLine("Checking destination changed for " + index);
         return (Files[index].Destination != Files[index].Source);
     }
 
@@ -109,7 +109,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         if (Filesystem.File.Exists(path))
         {
             return Filesystem.FileInfo.New(path);
-        } else if (Filesystem.Directory.Exists(path))
+        }
+        else if (Filesystem.Directory.Exists(path))
         {
             return Filesystem.DirectoryInfo.New(path);
         }
@@ -117,22 +118,76 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         throw new InvalidOperationException("Not a valid file or directory path: " + path);
     }
 
-    private void AddFiles(List<File> newFiles)
+    private void AddFSInfoRecursive(IFileSystemInfo newEntry, FiltersModel fileFilters, bool isRootLevel = false)
+    {
+        bool isHidden = ((newEntry.Attributes & FileAttributes.Hidden) != 0);
+        if (isHidden && (! fileFilters.IncludeHidden))
+        {
+            return;
+        }
+
+        bool isSystem = ((newEntry.Attributes & FileAttributes.System) != 0);
+        if (isSystem && (! fileFilters.IncludeSystem))
+        {
+            return;
+        }
+
+        if (newEntry is IFileInfo newFile)
+        {
+            Files.Add(new File(newFile, Filesystem));
+        }
+        else if (newEntry is IDirectoryInfo newDir)
+        {
+            if (! fileFilters.ItemsInFolders)
+            {
+                if (fileFilters.FoldersAsItems)
+                {
+                    Files.Add(new File(newDir, Filesystem));
+                }
+
+                return;
+            }
+
+            if (fileFilters.FoldersAsItems && (! fileFilters.SkipRootFolders))
+            {
+                Files.Add(new File(newDir, Filesystem));
+            }
+
+            foreach (IFileSystemInfo subitem in newDir.GetFileSystemInfos())
+            {
+                if ((! isRootLevel) && (subitem is IDirectoryInfo) && (! fileFilters.IncludeSubfolders))
+                {
+                    continue;
+                }
+
+                AddFSInfoRecursive(subitem, fileFilters);
+            }
+        }
+    }
+
+    private void AddFileInfos(List<IFileSystemInfo> newFiles, FiltersModel? fileFilters = null)
     {
         int currentLastIndex = (Files.Count - 1);
-        BeginInsertRows(new ModelIndex(), currentLastIndex, currentLastIndex + newFiles.Count );
-        foreach (File newFile in newFiles)
+        BeginInsertRows(new ModelIndex(), currentLastIndex, currentLastIndex + newFiles.Count);
+        foreach (IFileSystemInfo newFile in newFiles)
         {
-            Files.Add(newFile);
+            if (fileFilters == null)
+            {
+                Files.Add(new File(newFile, Filesystem));
+                continue;
+            }
+
+            AddFSInfoRecursive(newFile, fileFilters, true);
         }
+
         EndInsertRows();
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Total files: " + Files.Count);
     }
 
-    public void AddSourceFiles(List<Uri> selectedFiles)
+    public void AddURIs(List<Uri> selectedFiles, FiltersModel? fileFilters = null)
     {
-        List<File> newFiles = [];
+        List<IFileSystemInfo> newFiles = [];
         try
         {
             foreach (Uri selectedFile in selectedFiles)
@@ -140,7 +195,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
                 // FIXME Display error when file/directory not found
                 // (probably fun with special chars similar to trailing spaces)
-                newFiles.Add(new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem));
+                newFiles.Add(FSInfoFromPath(selectedFile.LocalPath));
             }
         }
         catch (Exception e)
@@ -148,7 +203,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
         }
 
-        AddFiles(newFiles);
+        AddFileInfos(newFiles, fileFilters);
     }
 
     public File? AddSourceFile(Uri selectedFile)
@@ -157,7 +212,14 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         try
         {
             File newFile = new File(FSInfoFromPath(selectedFile.LocalPath), Filesystem);
-            AddFiles([newFile]);
+
+            int currentLastIndex = (Files.Count - 1);
+            BeginInsertRows(new ModelIndex(), currentLastIndex, currentLastIndex + 1);
+            Files.Add(newFile);
+            EndInsertRows();
+            PropertyChanged?.Invoke(this, new(nameof(Files)));
+            Debug.WriteLine("Total files: " + Files.Count);
+
             return newFile;
         }
         catch (InvalidOperationException e)
@@ -171,11 +233,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public void AddSourceDirectory(Uri selectedPath)
     {
         Debug.WriteLine("Add URI: " + selectedPath.LocalPath);
-        List<File> newFiles = [];
+        List<IFileSystemInfo> newFiles = [];
         try
         {
             IDirectoryInfo srcPath = Filesystem.DirectoryInfo.New(selectedPath.LocalPath);
-            if (!srcPath.Exists)
+            if (! srcPath.Exists)
             {
                 ShowError?.Invoke(this, new ShowErrorArgs("Not a valid directory: " + selectedPath.LocalPath));
                 return;
@@ -183,10 +245,10 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
             foreach (IFileSystemInfo file in srcPath.GetFileSystemInfos())
             {
-                newFiles.Add(new File(file, Filesystem));
+                newFiles.Add(file);
             }
 
-            AddFiles(newFiles);
+            AddFileInfos(newFiles);
         }
         catch (Exception e)
         {
@@ -194,17 +256,17 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
     }
 
-    public void Drop(string source, string items)
+    public void Drop(string items, FiltersModel fileFilters)
     {
-        Debug.WriteLine("Drop source: " + source);
         Debug.WriteLine("Items: " + items);
+        // TODO Update to obey file filters
 
         char[] seperators = ['\n'];
         string[] uriStrings = items.Split(seperators);
         List<Uri> uris = [];
         foreach (string uri in uriStrings)
         {
-            if (!uri.StartsWith("file://"))
+            if (! uri.StartsWith("file://"))
             {
                 // TODO Notify user when drop item is rejected?
                 Debug.WriteLine("Ignored URI: " + uri);
@@ -216,7 +278,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             uris.Add(new Uri(modifiedUri));
         }
 
-        AddSourceFiles(uris);
+        AddURIs(uris, fileFilters);
     }
 
     public void RunRules(RulesModel rulesModel)
@@ -233,25 +295,26 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             DataChanged(i, Headers.IndexOf("Status"));
             DataChanged(i, Headers.IndexOf("Error Message"));
         }
+
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Running rules complete");
-        
+
         RunConflictCheck();
     }
-    
+
     private void RunConflictCheck()
     {
         var indexA = -1;
         foreach (File fileA in Files)
         {
             indexA++;
-            
+
             bool hasConflict = false;
             var indexB = -1;
             foreach (File fileB in Files)
             {
                 indexB++;
-                
+
                 if ((fileA != fileB) && (fileA.Destination == fileB.Destination))
                 {
                     hasConflict = true;
@@ -264,7 +327,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 }
             }
 
-            if ((!hasConflict) && (fileA.Status == FileStatus.Conflict))
+            if ((! hasConflict) && (fileA.Status == FileStatus.Conflict))
             {
                 Debug.WriteLine($"{fileA.Source} ({indexA}) has no conflicts");
                 fileA.Status = FileStatus.Ready;
@@ -319,6 +382,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             DataChanged(i, Headers.IndexOf("Status"));
             DataChanged(i, Headers.IndexOf("Error Message"));
         }
+
         PropertyChanged?.Invoke(this, new(nameof(Files)));
         Debug.WriteLine("Rename complete");
     }

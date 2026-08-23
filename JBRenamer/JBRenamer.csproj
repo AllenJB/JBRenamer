@@ -28,11 +28,16 @@
             Condition="'$(QtBridgeTemplateRid)' != 'win-x64' and '$(QtBridgeTemplateRid)' != 'linux-x64'">
         <Error Text="Qt Bridge for C# currently supports win-x64 and linux-x64 only. Selected RID: '$(QtBridgeTemplateRid)'."/>
     </Target>
+    
+    <ItemGroup>
+        <QtResource Include="icons\*" />
+    </ItemGroup>
 
     <ItemGroup>
         <Compile Include="DebugModel.cs" />
         <Compile Include="File.cs" />
         <Compile Include="FilesModel.cs" />
+        <Compile Include="FiltersModel.cs" />
         <Compile Include="Rule.cs" />
         <Compile Include="RulesModel.cs" />
         <Compile Include="Rules\PrefixRule.cs" />
@@ -45,5 +50,9 @@
 
     <ItemGroup>
       <PackageReference Include="Testably.Abstractions" Version="10.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="icons\" />
     </ItemGroup>
 </Project>

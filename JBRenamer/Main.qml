@@ -93,11 +93,26 @@ ApplicationWindow {
             mainWindow.fileListUpdated();
         }
     }
+    
+    FiltersModel {
+        id: fileFilters
+        signal filtersUpdated()
+    }
+    
+    FiltersDialog {
+        id: filtersDialog
+    }
 
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
 
+            Action {
+                text: "Configure file filters"
+                onTriggered: {
+                    filtersDialog.open()
+                }
+            }
             Action {
                 text: "Add Source File(s)"
                 onTriggered: {

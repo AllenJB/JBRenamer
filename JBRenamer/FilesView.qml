@@ -29,7 +29,7 @@ DropArea {
         // with text using newline, while urls uses comma
         // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
         // So .text is used
-        files.drop(drop.formats, drop.text);
+        files.drop(drop.text, fileFilters);
         mainWindow.fileListUpdated();
     }
 
