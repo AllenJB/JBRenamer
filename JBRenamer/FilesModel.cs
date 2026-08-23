@@ -39,7 +39,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         "Error Message",
     ];
 
-    private List<File> Files = [];
+    [Qt.Ignore] public List<File> Files = [];
 
     protected override int Rows => Files.Count;
 
@@ -120,6 +120,11 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     private void AddFSInfoRecursive(IFileSystemInfo newEntry, FiltersModel fileFilters, bool isRootLevel = false)
     {
+        if (! newEntry.Exists)
+        {
+            return;
+        }
+
         bool isHidden = ((newEntry.Attributes & FileAttributes.Hidden) != 0);
         if (isHidden && (! fileFilters.IncludeHidden))
         {
@@ -148,19 +153,32 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 return;
             }
 
-            if (fileFilters.FoldersAsItems && (! fileFilters.SkipRootFolders))
+            try
             {
-                Files.Add(new File(newDir, Filesystem));
-            }
-
-            foreach (IFileSystemInfo subitem in newDir.GetFileSystemInfos())
-            {
-                if ((! isRootLevel) && (subitem is IDirectoryInfo) && (! fileFilters.IncludeSubfolders))
+                foreach (IFileSystemInfo subitem in newDir.GetFileSystemInfos("*",
+                             new EnumerationOptions { IgnoreInaccessible = true }))
                 {
-                    continue;
+                    if ((subitem is IDirectoryInfo) && (! fileFilters.IncludeSubfolders))
+                    {
+                        continue;
+                    }
+
+                    AddFSInfoRecursive(subitem, fileFilters);
                 }
 
-                AddFSInfoRecursive(subitem, fileFilters);
+                if (fileFilters.FoldersAsItems)
+                {
+                    Debug.WriteLine("isRootLevel = " + (isRootLevel ? "Y" : "N") + " :: SkipRootFolders = " +
+                                    (fileFilters.SkipRootFolders ? "Y" : "N" + " :: path: " + newDir.FullName));
+                    if (! (isRootLevel && fileFilters.SkipRootFolders))
+                    {
+                        Files.Add(new File(newDir, Filesystem));
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Debug.WriteLine("Ignored path: " + newDir.FullName + " :: " + e.Message);
             }
         }
     }
@@ -188,19 +206,26 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
     public void AddURIs(List<Uri> selectedFiles, FiltersModel? fileFilters = null)
     {
         List<IFileSystemInfo> newFiles = [];
-        try
+        List<string> invalidURIs = [];
+        foreach (Uri selectedFile in selectedFiles)
         {
-            foreach (Uri selectedFile in selectedFiles)
+            try
             {
                 Debug.WriteLine("Add file URI: '" + selectedFile.LocalPath + "'");
                 // FIXME Display error when file/directory not found
                 // (probably fun with special chars similar to trailing spaces)
                 newFiles.Add(FSInfoFromPath(selectedFile.LocalPath));
             }
+            catch (Exception e)
+            {
+                invalidURIs.Add(selectedFile.LocalPath);
+            }
         }
-        catch (Exception e)
+
+        if (invalidURIs.Count > 0)
         {
-            ShowError?.Invoke(this, new ShowErrorArgs(e.Message));
+            var errorMsg = "One or more entries could not be added:\n" + String.Join("\n", invalidURIs);
+            ShowError?.Invoke(this, new ShowErrorArgs(errorMsg));
         }
 
         AddFileInfos(newFiles, fileFilters);
