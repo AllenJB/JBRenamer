@@ -16,7 +16,7 @@ Dialog {
     
     onAccepted: function() {
         ruleConfig.children[ruleConfig.currentIndex].saveRule();
-        mainWindow.ruleListUpdated();
+        rules.ruleListUpdated();
     }
     
     width: 640

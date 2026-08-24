@@ -6,10 +6,11 @@ import QtQuick.Dialogs
 ToolBar {
     Layout.fillWidth: true
 
-    signal fileListUpdated()
-
-    onFileListUpdated: function () {
-        fileCount.text = files.count() + " items";
+    Connections {
+        target: files
+        function onFileListUpdated() {
+            fileCount.text = files.count() + " items";
+        }
     }
 
     Connections {

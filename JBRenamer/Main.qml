@@ -16,23 +16,34 @@ ApplicationWindow {
 
     FilesModel {
         id: files
+
+        signal fileListUpdated()
+
+        onShowError: function (args) {
+            popupError.message = args.message;
+            popupError.open();
+        }
+
+        onFileListUpdated: function () {
+            files.runRules(rules);
+        }
     }
 
     RulesModel {
         id: rules
+        
+        signal ruleListUpdated()
+        
+        onRuleListUpdated: function() {
+            files.runRules(rules);
+            Qt.callLater(function () {
+                rulesTable.forceLayout();
+            });
+        }
     }
 
     DebugModel {
         id: debug
-    }
-
-    Connections {
-        target: files
-
-        function onShowError(args) {
-            popupError.message = args.message;
-            popupError.open();
-        }
     }
 
     Dialog {
@@ -50,24 +61,6 @@ ApplicationWindow {
         }
     }
 
-    signal fileListUpdated()
-
-    signal ruleListUpdated()
-
-    onFileListUpdated: function () {
-        files.runRules(rules);
-        filesView.fileListUpdated();
-        statusBar.fileListUpdated();
-    }
-
-    onRuleListUpdated: function () {
-        files.runRules(rules);
-        filesView.ruleListUpdated();
-        Qt.callLater(function () {
-            rulesTable.forceLayout();
-        })
-    }
-
     FileDialog {
         id: addSourceFileDialog
         acceptLabel: "Add Source File(s)"
@@ -80,7 +73,7 @@ ApplicationWindow {
                 console.log("Xception:", e);
                 Debug.log("Exception: " + e);
             }
-            mainWindow.fileListUpdated();
+            files.fileListUpdated();
         }
     }
 
@@ -90,15 +83,16 @@ ApplicationWindow {
         options: FolderDialog.DontResolveSymlinks
         onAccepted: {
             files.addSourceDirectory(selectedFolder);
-            mainWindow.fileListUpdated();
+            files.fileListUpdated();
         }
     }
-    
+
     FiltersModel {
         id: fileFilters
+
         signal filtersUpdated()
     }
-    
+
     FiltersDialog {
         id: filtersDialog
     }
@@ -129,14 +123,14 @@ ApplicationWindow {
                 text: "Rename files"
                 onTriggered: {
                     files.renameFiles(rules);
-                    fileListUpdated();
+                    files.fileListUpdated();
                 }
             }
             Action {
                 text: "Clear File List"
                 onTriggered: {
                     files.clear();
-                    fileListUpdated();
+                    files.fileListUpdated();
                 }
             }
             Action {

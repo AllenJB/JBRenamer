@@ -4,21 +4,26 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 
 DropArea {
-    signal fileListUpdated()
-    signal ruleListUpdated()
-    
-    onFileListUpdated: function() {
-        Qt.callLater(function() {
-            fileTable.forceLayout();
-        });
+    Connections {
+        target: files
+        
+        function onFileListUpdated() {
+            Qt.callLater(function() {
+                fileTable.forceLayout();
+            });
 
-        dropFilesLabel.visible = (files.count() == 0);
+            dropFilesLabel.visible = (files.count() == 0);
+        }
     }
     
-    onRuleListUpdated: function() {
-        Qt.callLater(function() {
-            fileTable.forceLayout();
-        });
+    Connections {
+        target: rules
+        
+        function onRuleListUpdated() {
+            Qt.callLater(function() {
+                fileTable.forceLayout();
+            });
+        }
     }
     
     Layout.fillWidth: true
@@ -30,7 +35,7 @@ DropArea {
         // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
         // So .text is used
         files.drop(drop.text, fileFilters);
-        mainWindow.fileListUpdated();
+        files.fileListUpdated();
     }
 
     ColumnLayout {
