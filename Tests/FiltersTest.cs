@@ -65,11 +65,11 @@ public class DefaultUnixFileModeStrategy : IUnixFileModeStrategy
 
 public class FiltersTest
 {
-    private ITestOutputHelper output;
+    private readonly ITestOutputHelper Output;
 
     public FiltersTest(ITestOutputHelper output)
     {
-        this.output = output;
+        this.Output = output;
     }
 
     private MockFileSystem CreateFileSystem(string basePath)
@@ -145,7 +145,7 @@ public class FiltersTest
         }
         catch (XunitException)
         {
-            output.WriteLine(string.Join("\n", uris));
+            Output.WriteLine(string.Join("\n", uris));
             throw;
         }
     }

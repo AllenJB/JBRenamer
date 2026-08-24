@@ -17,7 +17,6 @@ Dialog {
         fileFilters.setFoldersAsItems(filterFoldersAsItems.checkState === Qt.Checked);
         fileFilters.setIncludeSubfolders(filterIncludeSubfolders.checkState === Qt.Checked);
         fileFilters.setIncludeHidden(filterIncludeHiddenItems.checkState === Qt.Checked);
-        fileFilters.setIncludeSystem(filterIncludeSystemItems.checkState === Qt.Checked);
         fileFilters.setSkipRootFolders(filterSkipRootFolders.checkState === Qt.Checked);
         fileFilters.filtersUpdated();
     }
@@ -79,19 +78,6 @@ Dialog {
                 id: filterIncludeHiddenItems
                 text: "Include hidden items"
                 checkState: (fileFilters.includeHidden ? Qt.Checked : Qt.Unchecked)
-            }
-
-            Image {
-                source: "qrc:/assemblies/JBRenamer/icons/filters_system.png"
-                width: 24; height: 24
-                Layout.preferredWidth: 24
-                Layout.preferredHeight: 24
-            }
-            CheckBox {
-                Layout.fillWidth: true
-                id: filterIncludeSystemItems
-                text: "Include system items"
-                checkState: (fileFilters.includeSystem ? Qt.Checked : Qt.Unchecked)
             }
 
             Image {

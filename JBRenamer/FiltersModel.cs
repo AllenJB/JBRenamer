@@ -23,8 +23,6 @@ public class FiltersModel : INotifyPropertyChanged
 
     public bool IncludeHidden = false;
 
-    public bool IncludeSystem = false;
-
     public bool SkipRootFolders = true;
 
     public void SetItemsInFolders(bool value)
@@ -49,15 +47,6 @@ public class FiltersModel : INotifyPropertyChanged
     {
         IncludeHidden = value;
         NotifyPropertyChanged();
-    }
-
-    public void SetIncludeSystem(bool value)
-    {
-        IncludeSystem = value;
-        if (PropertyChanged != null)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(IncludeSystem)));
-        }
     }
 
     public void SetSkipRootFolders(bool value)

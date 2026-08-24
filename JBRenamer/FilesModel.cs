@@ -131,12 +131,6 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
             return;
         }
 
-        bool isSystem = ((newEntry.Attributes & FileAttributes.System) != 0);
-        if (isSystem && (! fileFilters.IncludeSystem))
-        {
-            return;
-        }
-
         if (newEntry is IFileInfo newFile)
         {
             Files.Add(new File(newFile, Filesystem));
