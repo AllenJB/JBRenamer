@@ -18,65 +18,44 @@ ToolBar {
 
         function onFiltersUpdated() {
             console.log("filtersUpdated");
-            filterStateItemsInFolders.opacity = (fileFilters.itemsInFolders ? 1.0 : 0.0);
-            filterStateFoldersAsItems.opacity = (fileFilters.foldersAsItems ? 1.0 : 0.0);
-            filterStateIncludeSubfolders.opacity = (fileFilters.includeSubfolders ? 1.0 : 0.0);
-            filterStateIncludeHidden.opacity = (fileFilters.includeHidden ? 1.0 : 0.0);
-            filterStateSkipRootFolders.opacity = (fileFilters.skipRootFolders ? 1.0 : 0.0);
+            filterStateItemsInFolders.filterEnabled = fileFilters.itemsInFolders;
+            filterStateFoldersAsItems.filterEnabled = fileFilters.foldersAsItems;
+            filterStateIncludeSubfolders.filterEnabled = fileFilters.includeSubfolders;
+            filterStateIncludeHidden.filterEnabled = fileFilters.includeHidden;
+            filterStateSkipRootFolders.filterEnabled = fileFilters.skipRootFolders;
         }
     }
 
     RowLayout {
-
-        ToolButton {
+        FilterButton {
             id: filterStateItemsInFolders
-            icon.source: "qrc:/assemblies/JBRenamer/icons/filters_files_in_folders.png"
-            opacity: (fileFilters.itemsInFolders ? 1.0 : 0.0)
-            flat: true
-            enabled: false
-            
-            ToolTip.visible: (hovered && (filterStateItemsInFolders.opacity === 1.0))
-            ToolTip.text: "Add items within folders"
+            source: "qrc:/assemblies/JBRenamer/icons/filters_files_in_folders.png"
+            tooltip: "Add items within folders"
+            filterEnabled: fileFilters.itemsInFolders
         }
-        ToolButton {
+        FilterButton {
             id: filterStateFoldersAsItems
-            icon.source: "qrc:/assemblies/JBRenamer/icons/filters_folders_as_files.png"
-            opacity: (fileFilters.foldersAsItems ? 1.0 : 0.0)
-            flat: true
-            enabled: false
-
-            ToolTip.text: "Add folders as items"
-            ToolTip.visible: (hovered && (filterStateFoldersAsItems.opacity === 1.0))
+            source: "qrc:/assemblies/JBRenamer/icons/filters_folders_as_files.png"
+            filterEnabled: fileFilters.foldersAsItems
+            tooltip: "Add folders as items"
         }
-        ToolButton {
+        FilterButton {
             id: filterStateIncludeSubfolders
-            icon.source: "qrc:/assemblies/JBRenamer/icons/filters_subfolders.png"
-            opacity: (fileFilters.includeSubfolders ? 1.0 : 0.0)
-            flat: true
-            enabled: false
-
-            ToolTip.text: "Include subfolders"
-            ToolTip.visible: (hovered && (filterStateIncludeSubfolders.opacity === 1.0))
+            source: "qrc:/assemblies/JBRenamer/icons/filters_subfolders.png"
+            filterEnabled: fileFilters.includeSubfolders
+            tooltip: "Include subfolders"
         }
-        ToolButton {
+        FilterButton {
             id: filterStateIncludeHidden
-            icon.source: "qrc:/assemblies/JBRenamer/icons/filters_hidden.png"
-            opacity: (fileFilters.includeHiddenItems ? 1.0 : 0.0)
-            flat: true
-            enabled: false
-
-            ToolTip.text: "Include hidden items"
-            ToolTip.visible: (hovered && (filterStateIncludeHidden.opacity === 1.0))
+            source: "qrc:/assemblies/JBRenamer/icons/filters_hidden.png"
+            filterEnabled: fileFilters.includeHidden
+            tooltip: "Include hidden items"
         }
-        ToolButton {
+        FilterButton {
             id: filterStateSkipRootFolders
-            icon.source: "qrc:/assemblies/JBRenamer/icons/filters_skip_root_folders.png"
-            opacity: (fileFilters.skipRootFolders ? 1.0 : 0.0)
-            flat: true
-            enabled: false
-
-            ToolTip.text: "Skip root folders when added as items"
-            ToolTip.visible: (hovered && (filterStateSkipRootFolders.opacity === 1.0))
+            source: "qrc:/assemblies/JBRenamer/icons/filters_skip_root_folders.png"
+            filterEnabled: fileFilters.skipRootFolders
+            tooltip: "Skip root folders when added as items"
         }
 
         ToolSeparator {

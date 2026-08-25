@@ -52,9 +52,6 @@ public class FiltersModel : INotifyPropertyChanged
     public void SetSkipRootFolders(bool value)
     {
         SkipRootFolders = value;
-        if (PropertyChanged != null)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(SkipRootFolders)));
-        }
+        NotifyPropertyChanged();
     }
 }
