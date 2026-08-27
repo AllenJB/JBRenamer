@@ -6,30 +6,30 @@ import QtQuick.Dialogs
 DropArea {
     Connections {
         target: files
-        
+
         function onFileListUpdated() {
-            Qt.callLater(function() {
+            Qt.callLater(function () {
                 fileTable.forceLayout();
             });
 
-            dropFilesLabel.visible = (files.count() == 0);
+            dropFilesLabel.visible = (files.count() === 0);
         }
     }
-    
+
     Connections {
         target: rules
-        
+
         function onRuleListUpdated() {
-            Qt.callLater(function() {
+            Qt.callLater(function () {
                 fileTable.forceLayout();
             });
         }
     }
-    
+
     Layout.fillWidth: true
     Layout.fillHeight: true
 
-    onDropped: function(drop) {
+    onDropped: function (drop) {
         // Both DragEvent text and urls properties appear to be seperated lists
         // with text using newline, while urls uses comma
         // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
@@ -80,12 +80,37 @@ DropArea {
                                 return "darkgray";
                             }
                             text: (newNameDelegate.model.display ?? "")
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onClicked: fileSelection.clickRow(mouse, row)
+                            }
                         }
+
+                        ContextMenu.menu: rowContextMenu
                     }
                 }
                 DelegateChoice {
                     delegate: TableViewDelegate {
                         padding: 5
+                        id: tvd
+
+                        ContextMenu.menu: rowContextMenu
+                        contentItem: Label {
+                            clip: false
+                            text: tvd.model.display ?? ""
+                            elide: Text.ElideRight
+                            color: tvd.highlighted ? tvd.palette.highlightedText : tvd.palette.buttonText
+                            visible: !tvd.editing
+
+                            // TODO Clicking the edge / between rows seems to trigger something different
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onClicked: fileSelection.clickRow(mouse, row)
+                            }
+                        }
                     }
                 }
             }
@@ -109,6 +134,52 @@ DropArea {
                 return columnWidths[columnName];
             }
 
+            acceptedButtons: Qt.NoButton
+            selectionModel: ItemSelectionModel {
+                id: fileSelection
+                property int prevRow: -1
+
+                onSelectionChanged: function () {
+                    console.log("selectedIndexes count: " + selectedIndexes.length);
+                    console.log(selectedIndexes)
+                }
+                onCurrentChanged: function () {
+                    console.log("selection current changed:", currentIndex);
+                }
+
+                signal clickRow(mouse: MouseEvent, row: int);
+
+                onClickRow: function (mouse, row) {
+                    let prevRow = fileSelection.prevRow
+                    console.log("click", mouse, mouse.button, mouse.modifiers);
+                    if (mouse.button !== Qt.LeftButton) {
+                        console.log("Not left button");
+                        return;
+                    }
+                    if (mouse.modifiers === Qt.NoModifier) {
+                        console.log("No modifier");
+                        fileSelection.select(fileTable.model.index(row, 0), ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows);
+                    } else if (mouse.modifiers & Qt.ShiftModifier) {
+                        console.log("Shift modifier :: prevRow = " + prevRow);
+                        if ((prevRow === -1) || (prevRow === row)) {
+                            fileSelection.select(fileTable.model.index(row, 0), ItemSelectionModel.Select | ItemSelectionModel.Rows);
+                        } else {
+                            let firstRow = (prevRow < row ? prevRow : row);
+                            let lastRow = (prevRow < row ? row : prevRow);
+                            for (let iRow = firstRow; iRow <= lastRow; iRow++) {
+                                console.log("Add row to selection: " + iRow);
+                                fileSelection.select(fileTable.model.index(iRow, 0), ItemSelectionModel.Select | ItemSelectionModel.Rows);
+                            }
+                        }
+                    } else if (mouse.modifiers & Qt.ControlModifier) {
+                        console.log("Ctrl modifier");
+                        fileSelection.select(fileTable.model.index(row, 0), ItemSelectionModel.Toggle | ItemSelectionModel.Rows);
+                    }
+
+                    fileSelection.prevRow = row;
+                    console.log("prevRow updated to " + fileSelection.prevRow);
+                }
+            }
             selectionBehavior: TableView.SelectRows
             selectionMode: TableView.ExtendedSelection
             editTriggers: TableView.NoEditTriggers
@@ -117,6 +188,63 @@ DropArea {
             }
             ScrollBar.horizontal: ScrollBar {
                 policy: ScrollBar.AlwaysOn
+            }
+
+            ContextMenu.menu: Menu {
+                MenuItem {
+                    text: "Clear file list"
+                    onTriggered: {
+                        files.clear();
+                        files.fileListUpdated();
+                    }
+                }
+            }
+
+            Menu {
+                id: rowContextMenu
+                // @formatter:off
+                readonly property TableViewDelegate triggerItem: parent as TableViewDelegate
+                // @formatter:on
+
+                MenuItem {
+                    text: "X Clear file list"
+                    onTriggered: {
+                        files.clear();
+                        files.fileListUpdated();
+                    }
+                }
+                MenuItem {
+                    text: "Row: " + rowContextMenu.triggerItem.row + ", " + rowContextMenu.triggerItem.column + " = " + rowContextMenu.triggerItem.model.display
+                    onTriggered: {
+                        console.log(rowContextMenu.triggerItem)
+                    }
+                }
+                MenuItem {
+                    enabled: fileSelection.hasSelection
+                    text: "Remove selected items"
+                    onTriggered: {
+                        let selectedIndexes = fileSelection.selectedIndexes;
+                        console.log("Remove items: " + selectedIndexes);
+                        
+                        let selectedRows = [];
+                        for (let idx of selectedIndexes) {
+                            if (selectedRows.includes(idx.row)) {
+                                continue;
+                            }
+                            selectedRows.push(idx.row);
+                        }
+                        fileSelection.clear();
+                        
+                        // Process rows in reverse order to avoid index shifts
+                        selectedRows.sort().reverse();
+                        console.log(selectedRows);
+                        for (let row of selectedRows) {
+                            files.removeRow(row);
+                        }
+
+                        files.fileListUpdated();
+                    }
+                }
             }
         }
     }

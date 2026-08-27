@@ -300,6 +300,75 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         AddURIs(uris, fileFilters);
     }
 
+    /*
+    [Qt.Ignore]
+    protected List<(int, int)> RowRangesFromSelection(int[] rowsArr)
+    {
+        List<int> rows = new List<int>(rowsArr);
+        // Order by descending so indexes don't get shifted as multiple selections are removed
+        rows.OrderDescending();
+
+        List<(int, int)> rowRanges = [];
+        int rangeStart = -1;
+        int rangeEnd = -1;
+        foreach (int row in rows)
+        {
+            if (rangeEnd == -1)
+            {
+                rangeStart = row;
+                rangeEnd = row;
+                continue;
+            }
+
+            if (row < rangeEnd - 1)
+            {
+                rowRanges.Add((rangeStart, rangeEnd));
+                rangeStart = row;
+                rangeEnd = row;
+                continue;
+            }
+        }
+
+        rowRanges.Add((rangeStart, rangeEnd));
+
+        return rowRanges;
+    }
+
+    public void RemoveSelection(int[] rows)
+    {
+        List<(int, int)> rowRanges = RowRangesFromSelection(rows);
+
+        foreach ((int rangeStart, int rangeEnd) in rowRanges)
+        {
+            BeginRemoveRows(ModelIndex.Empty, rangeStart, rangeEnd);
+            for (int i = rangeEnd; i >= rangeStart; i--)
+            {
+                Files.RemoveAt(i);
+            }
+
+            EndRemoveRows();
+        }
+    }
+    */
+
+    public void RemoveRow(int row)
+    {
+        BeginRemoveRows(new ModelIndex(), row, row);
+        Files.RemoveAt(row);
+        EndRemoveRows();
+        RowChanged(row);
+        PropertyChanged?.Invoke(this, new(nameof(Files)));
+        Debug.WriteLine("Total files: " + Files.Count);
+    }
+
+    private void RowChanged(int row)
+    {
+        for (int i = 0; i < Headers.Count; i++)
+        {
+            DataChanged(row, i);
+        }
+    }
+
     public void RunRules(RulesModel rulesModel)
     {
         Debug.WriteLine("Running rules");
