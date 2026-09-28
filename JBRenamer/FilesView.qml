@@ -71,13 +71,13 @@ DropArea {
                                 console.log(newNameDelegate.model.display);
 
                                 if (files.destinationConflicts(newNameDelegate.row)) {
-                                    return "red";
+                                    return (Application.styleHints.colorScheme === Qt.ColorScheme.Light ? "red" : "tomato");
                                 }
                                 if (files.destinationChanged(newNameDelegate.row)) {
-                                    return "darkblue";
+                                    return palette.accent;
                                 }
 
-                                return "darkgray";
+                                return palette.placeholderText;
                             }
                             text: (newNameDelegate.model.display ?? "")
 
@@ -254,7 +254,7 @@ DropArea {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: "Drag your files here"
-        color: "#000066"
+        color: palette.placeholderText
         font.pixelSize: 24
         font.weight: Font.DemiBold
     }

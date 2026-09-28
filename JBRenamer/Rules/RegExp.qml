@@ -23,7 +23,7 @@ RuleConfig {
             id: regexpConfigReplaceText
             Layout.fillWidth: true
         }
-        Text {
+        Label {
             Layout.columnSpan: 2
             textFormat: Text.RichText
             text: "See the <a href='https://learn.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference'>Regular Expression Language Quick Reference</a>."

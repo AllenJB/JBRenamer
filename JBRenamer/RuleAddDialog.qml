@@ -36,6 +36,7 @@ Dialog {
                 Text {
                     id: ruleTypeSelectItemText
                     font.bold: index === ruleConfig.currentIndex
+                    color: palette.text
                     padding: 5
 
                     text: name
@@ -44,7 +45,7 @@ Dialog {
             }
             highlight: Rectangle {
                 width: 180; height: 40
-                color: "lightsteelblue"; radius: 5
+                color: palette.accent; radius: 5
                 y: ruleTypeSelect.currentItem.y
                 Behavior on y {
                     SpringAnimation {
@@ -76,7 +77,7 @@ Dialog {
             currentIndex: 0
 
             Rules.RuleConfig {
-                Text {
+                Label {
                     text: "Select a rule type"
                 }
             }

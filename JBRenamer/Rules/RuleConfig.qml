@@ -3,6 +3,6 @@ import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-Rectangle {
+Item {
     signal saveRule()
 }

@@ -53,6 +53,11 @@ public class File : IDisplayable
             throw new UnreachableException();
         }
 
+        if (newDest.FullName == Destination)
+        {
+            return;
+        }
+
         Destination = newDest.FullName;
         DestinationFile = newDest;
         Status = FileStatus.Ready;
