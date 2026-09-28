@@ -11,16 +11,6 @@ using Testably.Abstractions;
 
 namespace JBRenamer;
 
-public class ShowErrorArgs : EventArgs
-{
-    public string Message { get; set; }
-
-    public ShowErrorArgs(string message)
-    {
-        this.Message = message;
-    }
-}
-
 public class FilesModel : TableModel<string>, INotifyPropertyChanged
 {
     private IFileSystem Filesystem = new RealFileSystem();

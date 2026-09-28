@@ -43,6 +43,7 @@
         <Compile Include="Rules\PrefixRule.cs" />
         <Compile Include="Rules\RegExpRule.cs" />
         <Compile Include="Rules\ReplaceRule.cs" />
+        <Compile Include="ShowErrorArgs.cs" />
         <None Include="Main.qml"/>
         <None Include="Rules/*.qml" />
         <Compile Include="Program.cs"/>
