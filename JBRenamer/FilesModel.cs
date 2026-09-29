@@ -73,12 +73,24 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
     public bool DestinationChanged(int index)
     {
+        if (index >= Files.Count)
+        {
+            Debug.WriteLine("DestinationChanged: Invalid index: " + index);
+            return false;
+        }
+
         Debug.WriteLine("Checking destination changed for " + index);
         return (Files[index].Destination != Files[index].Source);
     }
 
     public bool DestinationConflicts(int index)
     {
+        if (index >= Files.Count)
+        {
+            Debug.WriteLine("DestinationConflicts: Invalid index: " + index);
+            return false;
+        }
+
         return (Files[index].Status == FileStatus.Conflict);
     }
 
@@ -152,8 +164,10 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
 
                 if (fileFilters.FoldersAsItems)
                 {
-                    Debug.WriteLine("isRootLevel = " + (isRootLevel ? "Y" : "N") + " :: SkipRootFolders = " +
-                                    (fileFilters.SkipRootFolders ? "Y" : "N" + " :: path: " + newDir.FullName));
+                    Debug.WriteLine(
+                        "isRootLevel = " + (isRootLevel ? "Y" : "N") + " :: SkipRootFolders = " +
+                        (fileFilters.SkipRootFolders ? "Y" : "N" + " :: path: " + newDir.FullName)
+                    );
                     if (! (isRootLevel && fileFilters.SkipRootFolders))
                     {
                         Files.Add(new File(newDir, Filesystem));
@@ -200,7 +214,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
                 // (probably fun with special chars similar to trailing spaces)
                 newFiles.Add(FSInfoFromPath(selectedFile.LocalPath));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 invalidURIs.Add(selectedFile.LocalPath);
             }
