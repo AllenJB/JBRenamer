@@ -27,6 +27,6 @@ RuleConfig {
 
     onSaveRule: function() {
         debug.log("saveRule() prefix");
-        rules.addPrefixRule(prefixConfigValueText.text);
+        program.rules.addPrefixRule(prefixConfigValueText.text);
     }
 }

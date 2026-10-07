@@ -284,8 +284,8 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Items: " + items);
         // TODO Update to obey file filters
 
-        char[] seperators = ['\n'];
-        string[] uriStrings = items.Split(seperators);
+        char[] separators = ['\n'];
+        string[] uriStrings = items.Split(separators);
         List<Uri> uris = [];
         foreach (string uri in uriStrings)
         {

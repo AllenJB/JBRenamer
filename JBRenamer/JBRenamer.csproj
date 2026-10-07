@@ -38,6 +38,8 @@
         <Compile Include="File.cs" />
         <Compile Include="FilesModel.cs" />
         <Compile Include="FiltersModel.cs" />
+        <Compile Include="Presets\Model.cs" />
+        <Compile Include="Presets\Preset.cs" />
         <Compile Include="Rule.cs" />
         <Compile Include="RulesModel.cs" />
         <Compile Include="Rules\PrefixRule.cs" />

@@ -5,19 +5,15 @@ import QtQuick.Dialogs
 
 DropArea {
     Connections {
-        target: files
+        target: program
 
         function onFileListUpdated() {
             Qt.callLater(function () {
                 fileTable.forceLayout();
             });
 
-            dropFilesLabel.visible = (files.count() === 0);
+            dropFilesLabel.visible = (program.files.count() === 0);
         }
-    }
-
-    Connections {
-        target: rules
 
         function onRuleListUpdated() {
             Qt.callLater(function () {
@@ -34,8 +30,8 @@ DropArea {
         // with text using newline, while urls uses comma
         // There appears to be no way to tell when a comma appears in a filename, while \n is much less common
         // So .text is used
-        files.drop(drop.text, fileFilters);
-        files.fileListUpdated();
+        program.files.drop(drop.text, program.filters);
+        program.fileListUpdated();
     }
 
     ColumnLayout {
@@ -53,7 +49,7 @@ DropArea {
         }
         TableView {
             id: fileTable
-            model: files
+            model: program.files
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -61,7 +57,7 @@ DropArea {
             columnSpacing: 2
             delegate: DelegateChooser {
                 DelegateChoice {
-                    column: files.columnIndex("New Name")
+                    column: program.files.columnIndex("New Name")
                     delegate: TableViewDelegate {
                         id: newNameDelegate
                         contentItem: Label {
@@ -70,10 +66,10 @@ DropArea {
                                 // Trick the engine into making this link to displayed value changes
                                 console.log(newNameDelegate.model.display);
 
-                                if (files.destinationConflicts(newNameDelegate.row)) {
+                                if (program.files.destinationConflicts(newNameDelegate.row)) {
                                     return (Application.styleHints.colorScheme === Qt.ColorScheme.Light ? "red" : "tomato");
                                 }
-                                if (files.destinationChanged(newNameDelegate.row)) {
+                                if (program.files.destinationChanged(newNameDelegate.row)) {
                                     return palette.accent;
                                 }
 
@@ -124,7 +120,7 @@ DropArea {
                 "Error Message": 250,
             }
             columnWidthProvider: function (column) {
-                let columnName = files.columnName(column);
+                let columnName = program.files.columnName(column);
 
                 let w = explicitColumnWidth(column);
                 if (w >= 0) {
@@ -194,8 +190,8 @@ DropArea {
                 MenuItem {
                     text: "Clear file list"
                     onTriggered: {
-                        files.clear();
-                        files.fileListUpdated();
+                        program.files.clear();
+                        program.fileListUpdated();
                     }
                 }
             }
@@ -209,8 +205,8 @@ DropArea {
                 MenuItem {
                     text: "X Clear file list"
                     onTriggered: {
-                        files.clear();
-                        files.fileListUpdated();
+                        program.files.clear();
+                        program.fileListUpdated();
                     }
                 }
                 MenuItem {
@@ -239,10 +235,10 @@ DropArea {
                         selectedRows.sort().reverse();
                         console.log(selectedRows);
                         for (let row of selectedRows) {
-                            files.removeRow(row);
+                            program.files.removeRow(row);
                         }
 
-                        files.fileListUpdated();
+                        program.fileListUpdated();
                     }
                 }
             }

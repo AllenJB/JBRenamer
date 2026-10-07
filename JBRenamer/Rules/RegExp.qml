@@ -33,6 +33,6 @@ RuleConfig {
 
     onSaveRule: function() {
         debug.log("saveRule() regexp");
-        rules.addRegExpRule(regexpConfigFindText.text, regexpConfigReplaceText.text);
+        program.rules.addRegExpRule(regexpConfigFindText.text, regexpConfigReplaceText.text);
     }
 }

@@ -13,12 +13,12 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
 
     onAccepted: function () {
-        fileFilters.setItemsInFolders(filterItemsInFolders.checkState === Qt.Checked);
-        fileFilters.setFoldersAsItems(filterFoldersAsItems.checkState === Qt.Checked);
-        fileFilters.setIncludeSubfolders(filterIncludeSubfolders.checkState === Qt.Checked);
-        fileFilters.setIncludeHidden(filterIncludeHiddenItems.checkState === Qt.Checked);
-        fileFilters.setSkipRootFolders(filterSkipRootFolders.checkState === Qt.Checked);
-        fileFilters.filtersUpdated();
+        program.filters.setItemsInFolders(filterItemsInFolders.checkState === Qt.Checked);
+        program.filters.setFoldersAsItems(filterFoldersAsItems.checkState === Qt.Checked);
+        program.filters.setIncludeSubfolders(filterIncludeSubfolders.checkState === Qt.Checked);
+        program.filters.setIncludeHidden(filterIncludeHiddenItems.checkState === Qt.Checked);
+        program.filters.setSkipRootFolders(filterSkipRootFolders.checkState === Qt.Checked);
+        program.filtersUpdated();
     }
     
     GroupBox {
@@ -38,7 +38,7 @@ Dialog {
                 Layout.fillWidth: true
                 id: filterItemsInFolders
                 text: "Add items within folders"
-                checkState: (fileFilters.itemsInFolders ? Qt.Checked : Qt.Unchecked)
+                checkState: (program.filters.itemsInFolders ? Qt.Checked : Qt.Unchecked)
             }
 
             Image {
@@ -51,7 +51,7 @@ Dialog {
                 Layout.fillWidth: true
                 id: filterFoldersAsItems
                 text: "Add folders as items"
-                checkState: (fileFilters.foldersAsItems ? Qt.Checked : Qt.Unchecked)
+                checkState: (program.filters.foldersAsItems ? Qt.Checked : Qt.Unchecked)
             }
 
             Image {
@@ -64,7 +64,7 @@ Dialog {
                 Layout.fillWidth: true
                 id: filterIncludeSubfolders
                 text: "Include subfolders"
-                checkState: (fileFilters.includeSubfolders ? Qt.Checked : Qt.Unchecked)
+                checkState: (program.filters.includeSubfolders ? Qt.Checked : Qt.Unchecked)
             }
 
             Image {
@@ -77,7 +77,7 @@ Dialog {
                 Layout.fillWidth: true
                 id: filterIncludeHiddenItems
                 text: "Include hidden items"
-                checkState: (fileFilters.includeHidden ? Qt.Checked : Qt.Unchecked)
+                checkState: (program.filters.includeHidden ? Qt.Checked : Qt.Unchecked)
             }
 
             Image {
@@ -90,7 +90,7 @@ Dialog {
                 Layout.fillWidth: true
                 id: filterSkipRootFolders
                 text: "Skip root folders when added as items"
-                checkState: (fileFilters.skipRootFolders ? Qt.Checked : Qt.Unchecked)
+                checkState: (program.filters.skipRootFolders ? Qt.Checked : Qt.Unchecked)
             }
         }
     }

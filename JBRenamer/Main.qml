@@ -12,12 +12,10 @@ ApplicationWindow {
 
     Program {
         id: program
-    }
-
-    FilesModel {
-        id: files
 
         signal fileListUpdated()
+        signal ruleListUpdated()
+        signal filtersUpdated()
 
         onShowError: function (args) {
             popupError.message = args.message;
@@ -25,17 +23,11 @@ ApplicationWindow {
         }
 
         onFileListUpdated: function () {
-            files.runRules(rules);
+            program.files.runRules(program.rules);
         }
-    }
 
-    RulesModel {
-        id: rules
-        
-        signal ruleListUpdated()
-        
         onRuleListUpdated: function() {
-            files.runRules(rules);
+            program.files.runRules(program.rules);
             Qt.callLater(function () {
                 rulesTable.forceLayout();
             });
@@ -68,12 +60,12 @@ ApplicationWindow {
         options: FileDialog.DontResolveSymlinks | FileDialog.HideNameFilterDetails
         onAccepted: {
             try {
-                files.addSourceFile(selectedFile);
+                program.files.addSourceFile(selectedFile);
             } catch (e) {
                 console.log("Xception:", e);
                 Debug.log("Exception: " + e);
             }
-            files.fileListUpdated();
+            program.fileListUpdated();
         }
     }
 
@@ -82,15 +74,9 @@ ApplicationWindow {
         acceptLabel: "Add Source Files From Directory"
         options: FolderDialog.DontResolveSymlinks
         onAccepted: {
-            files.addSourceDirectory(selectedFolder);
-            files.fileListUpdated();
+            program.files.addSourceDirectory(selectedFolder);
+            program.fileListUpdated();
         }
-    }
-
-    FiltersModel {
-        id: fileFilters
-
-        signal filtersUpdated()
     }
 
     FiltersDialog {
@@ -122,15 +108,15 @@ ApplicationWindow {
             Action {
                 text: "Rename files"
                 onTriggered: {
-                    files.renameFiles(rules);
-                    files.fileListUpdated();
+                    program.files.renameFiles(program.rules);
+                    program.fileListUpdated();
                 }
             }
             Action {
                 text: "Clear File List"
                 onTriggered: {
-                    files.clear();
-                    files.fileListUpdated();
+                    program.files.clear();
+                    program.fileListUpdated();
                 }
             }
             Action {
@@ -182,7 +168,7 @@ ApplicationWindow {
             }
             TableView {
                 id: rulesTable
-                model: rules
+                model: program.rules
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
