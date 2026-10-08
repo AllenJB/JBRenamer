@@ -12,4 +12,9 @@ public abstract class Rule
     {
         RuleType = ruleType;
     }
+
+    public Rule Clone()
+    {
+        return (Rule) MemberwiseClone();
+    }
 }

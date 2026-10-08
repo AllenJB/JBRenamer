@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace JBRenamer;
@@ -13,6 +14,11 @@ public class FiltersModel : INotifyPropertyChanged
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    public FiltersModel Clone()
+    {
+        return (FiltersModel)MemberwiseClone();
     }
 
     public bool ItemsInFolders = false;
@@ -53,5 +59,14 @@ public class FiltersModel : INotifyPropertyChanged
     {
         SkipRootFolders = value;
         NotifyPropertyChanged();
+    }
+
+    public void Load(FiltersModel saved)
+    {
+        SetItemsInFolders(saved.ItemsInFolders);
+        SetFoldersAsItems(saved.FoldersAsItems);
+        SetIncludeSubfolders(saved.IncludeSubfolders);
+        SetIncludeHidden(saved.IncludeHidden);
+        SetSkipRootFolders(saved.SkipRootFolders);
     }
 }

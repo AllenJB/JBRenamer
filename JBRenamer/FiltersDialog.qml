@@ -11,6 +11,14 @@ Dialog {
     anchors.centerIn: parent
     closePolicy: Popup.CloseOnEscape
     standardButtons: Dialog.Ok | Dialog.Cancel
+    
+    onOpened: function() {
+        filterItemsInFolders.checkState = (program.filters.itemsInFolders ? Qt.Checked : Qt.Unchecked);
+        filterFoldersAsItems.checkState = (program.filters.foldersAsItems ? Qt.Checked : Qt.Unchecked);
+        filterIncludeSubfolders.checkState = (program.filters.includeSubfolders ? Qt.Checked : Qt.Unchecked);
+        filterIncludeHiddenItems.checkState = (program.filters.includeHidden ? Qt.Checked : Qt.Unchecked);
+        filterSkipRootFolders.checkState = (program.filters.skipRootFolders ? Qt.Checked : Qt.Unchecked);
+    }
 
     onAccepted: function () {
         program.filters.setItemsInFolders(filterItemsInFolders.checkState === Qt.Checked);

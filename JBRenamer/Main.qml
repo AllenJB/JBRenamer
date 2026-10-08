@@ -2,6 +2,8 @@
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
+// The ../ is required here because that's how the files end up laid out in the bin/Debug/net10.0/ directory
+import "../Presets" as Presets
 
 ApplicationWindow {
     id: mainWindow
@@ -83,6 +85,10 @@ ApplicationWindow {
         id: filtersDialog
     }
 
+    Presets.AddDialog {
+        id: presetAddDialog
+    }
+
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
@@ -134,7 +140,16 @@ ApplicationWindow {
                     ruleAddDialog.open()
                 }
             }
+            Action {
+                text: "Clear Rule List"
+                onTriggered: {
+                    program.rules.clear();
+                    program.ruleListUpdated();
+                }
+            }
         }
+
+        Presets.Menu {}
     }
 
     footer: StatusBar {

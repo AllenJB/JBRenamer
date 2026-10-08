@@ -57,4 +57,18 @@ public class RulesModel : TableModel<string>
     {
         Add(new PrefixRule(value));
     }
+
+    public void Clear()
+    {
+        Rules.Clear();
+    }
+
+    public void Load(List<Rule> saved)
+    {
+        Rules.Clear();
+        foreach (Rule savedRule in saved)
+        {
+            Rules.Add(savedRule.Clone());
+        }
+    }
 }
