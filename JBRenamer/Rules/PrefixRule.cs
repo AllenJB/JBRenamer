@@ -1,14 +1,17 @@
-using System.Text.RegularExpressions;
-
 namespace JBRenamer.Rules;
 
 public class PrefixRule : Rule
 {
-    private string Value;
-    
+    public string Value { get; init; }
+
     public PrefixRule(string value) : base("Prefix")
     {
         Value = value;
+    }
+
+    internal PrefixRule() : base("Prefix")
+    {
+        Value = "Deserialized";
     }
 
     public override string Run(string sourceUri)

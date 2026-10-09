@@ -4,15 +4,20 @@ namespace JBRenamer.Rules;
 
 public class RegExpRule : Rule
 {
-    private string Search;
+    public string Search { get; init;  }
 
-    private string Replace;
+    public string Replace { get; init; }
 
     // TODO Validate regexp
     public RegExpRule(string searchPattern, string replace) : base("RegExp")
     {
         Search = searchPattern;
         Replace = replace;
+    }
+
+    internal RegExpRule() : base("RegExp")
+    {
+        Search = Replace = "Deserialized";
     }
 
     public override string Run(string sourceUri)

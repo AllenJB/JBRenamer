@@ -1,12 +1,19 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO.Abstractions;
+using System.Xml.Serialization;
 using JBRenamer.Presets;
 using Qt.Quick;
+using Testably.Abstractions;
 
 namespace JBRenamer;
 
 public class Program
 {
+    private IFileSystem Filesystem = new RealFileSystem();
+
+    private string? ConfigDir = null;
+
     public RulesModel Rules = new();
 
     public FilesModel Files = new();
@@ -25,7 +32,81 @@ public class Program
 
     public Program()
     {
+        SetupConfigDir();
         Files.ShowError += ProxyShowError;
+        PresetsRestore();
+    }
+
+    private void SetupConfigDir()
+    {
+        string configPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
+            Path.DirectorySeparatorChar + "jbrenamer" + Path.DirectorySeparatorChar;
+
+        if (Filesystem.Directory.Exists(configPath))
+        {
+            ConfigDir = configPath;
+            return;
+        }
+
+        try
+        {
+            Filesystem.Directory.CreateDirectory(configPath);
+        }
+        catch
+        {
+            Debug.WriteLine("Config directory could not be created.");
+            return;
+        }
+
+        ConfigDir = configPath;
+    }
+
+    private void PresetSave(Preset preset)
+    {
+        if (ConfigDir == null)
+        {
+            return;
+        }
+
+        string presetsPath = ConfigDir + "presets" + Path.DirectorySeparatorChar;
+        if (! Filesystem.Directory.Exists(presetsPath))
+        {
+            Filesystem.Directory.CreateDirectory(presetsPath);
+        }
+
+        string filename = preset.Name;
+        FileSystemStream file = Filesystem.FileStream.New(presetsPath + filename, FileMode.Create);
+        XmlSerializer serializer = new(typeof(Preset));
+        serializer.Serialize(file, preset);
+        file.Close();
+    }
+
+    private void PresetsRestore()
+    {
+        if (ConfigDir == null)
+        {
+            Debug.WriteLine("PresetsRestore: ConfigDir is null");
+            return;
+        }
+
+        string presetsPath = ConfigDir + "presets" + Path.DirectorySeparatorChar;
+        if (! Filesystem.Directory.Exists(presetsPath))
+        {
+            Debug.WriteLine("PresetsRestore: Path does not exist: " + presetsPath);
+            return;
+        }
+
+        XmlSerializer serializer = new(typeof(Preset));
+        foreach (string filePath in Filesystem.Directory.EnumerateFiles(presetsPath))
+        {
+            FileSystemStream file = Filesystem.FileStream.New(filePath, FileMode.Open);
+            Preset? preset = (Preset?)serializer.Deserialize(file);
+            if (preset != null)
+            {
+                Presets.Add(preset);
+                Debug.WriteLine("Preset loaded: " + preset.Name);
+            }
+        }
     }
 
     public void PresetAdd(string name, bool includeFilters)
@@ -46,6 +127,8 @@ public class Program
         Preset preset = new Preset(name, presetRules, presetFilters);
         Presets.Add(preset);
         Debug.WriteLine("Total presets: " + Presets.Count);
+
+        PresetSave(preset);
     }
 
     public void PresetLoad(Preset preset)
