@@ -1,10 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using JBRenamer.Rules;
+using JBRenamer.Rules.Type;
 using Qt.Bridge.Models;
 
-namespace JBRenamer;
+namespace JBRenamer.Rules;
 
-public class RulesModel : TableModel<string>
+public class Model : TableModel<string>
 {
     private List<string> Headers { get; } =
     [

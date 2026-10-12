@@ -3,7 +3,10 @@ import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
 // The ../ is required here because that's how the files end up laid out in the bin/Debug/net10.0/ directory
+import "../Files" as Files
+import "../Filters" as Filters
 import "../Presets" as Presets
+import "../Rules" as Rules
 
 ApplicationWindow {
     id: mainWindow
@@ -81,7 +84,7 @@ ApplicationWindow {
         }
     }
 
-    FiltersDialog {
+    Filters.Dialog {
         id: filtersDialog
     }
 
@@ -156,7 +159,7 @@ ApplicationWindow {
         id: statusBar
     }
 
-    RuleAddDialog {
+    Rules.AddDialog {
         id: ruleAddDialog
     }
 
@@ -219,7 +222,7 @@ ApplicationWindow {
             }
         }
 
-        FilesView {
+        Files.FilesView {
             id: filesView
 
             Layout.fillWidth: true

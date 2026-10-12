@@ -35,16 +35,16 @@
 
     <ItemGroup>
         <Compile Include="DebugModel.cs" />
-        <Compile Include="File.cs" />
-        <Compile Include="FilesModel.cs" />
-        <Compile Include="FiltersModel.cs" />
+        <Compile Include="Files\File.cs" />
+        <Compile Include="Files\Model.cs" />
+        <Compile Include="Filters\FilterSettings.cs" />
         <Compile Include="Presets\Model.cs" />
         <Compile Include="Presets\Preset.cs" />
-        <Compile Include="Rule.cs" />
-        <Compile Include="RulesModel.cs" />
-        <Compile Include="Rules\PrefixRule.cs" />
-        <Compile Include="Rules\RegExpRule.cs" />
-        <Compile Include="Rules\ReplaceRule.cs" />
+        <Compile Include="Rules\Rule.cs" />
+        <Compile Include="Rules\Model.cs" />
+        <Compile Include="Rules\Type\PrefixRule.cs" />
+        <Compile Include="Rules\Type\RegExpRule.cs" />
+        <Compile Include="Rules\Type\ReplaceRule.cs" />
         <Compile Include="ShowErrorArgs.cs" />
         <None Include="Main.qml"/>
         <None Include="Rules/*.qml" />

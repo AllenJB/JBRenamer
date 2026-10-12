@@ -1,4 +1,4 @@
-namespace JBRenamer;
+namespace JBRenamer.Rules.Type;
 
 public abstract class Rule
 {

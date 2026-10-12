@@ -1,7 +1,7 @@
-
-using JBRenamer;
 using Testably.Abstractions.Testing;
 using Testably.Abstractions.Testing.Initializer;
+using FilesModel = JBRenamer.Files.Model;
+using RulesModel = JBRenamer.Rules.Model;
 
 namespace Tests;
 
@@ -22,12 +22,12 @@ public class RenameTest
         FilesModel files = new FilesModel();
         files.SetFilesystem(fs);
         files.AddSourceDirectory(new Uri("file:///path/to/test"));
-        
+
         Assert.Equal(2, files.Count());
 
         files.RunRules(rules);
         files.RenameFiles(rules);
-        
+
         Assert.True(fs.File.Exists("/path/to/test/filename w trailing space.txt "));
         Assert.True(fs.Directory.Exists("/path/to/test/directory w trailing space "));
         Assert.False(fs.File.Exists("/path/to/test/filename with trailing space.txt "));

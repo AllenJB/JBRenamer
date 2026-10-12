@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using JBRenamer.Filters;
+using JBRenamer.Rules.Type;
 using Qt.Bridge.Models;
 
 namespace JBRenamer.Presets;
@@ -23,7 +26,7 @@ public class Model(Program program) : ListModel<string>, INotifyPropertyChanged
     public void Add(string name, bool includeFilters)
     {
         Debug.WriteLine("Add new preset: " + name);
-        FiltersModel? filters = null;
+        FilterSettings? filters = null;
         if (includeFilters)
         {
             filters = program.Filters.Clone();

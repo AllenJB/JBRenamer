@@ -1,6 +1,7 @@
+using System.IO;
 using System.Text.RegularExpressions;
 
-namespace JBRenamer.Rules;
+namespace JBRenamer.Rules.Type;
 
 public class RegExpRule : Rule
 {

@@ -1,9 +1,10 @@
 using System.IO.Abstractions;
-using JBRenamer;
-using JBRenamer.Rules;
+using JBRenamer.Rules.Type;
 using Testably.Abstractions.Testing;
 using Testably.Abstractions.Testing.Initializer;
-using File = JBRenamer.File;
+using File = JBRenamer.Files.File;
+using FilesModel = JBRenamer.Files.Model;
+using RulesModel = JBRenamer.Rules.Model;
 
 namespace Tests;
 
@@ -23,9 +24,9 @@ public class FileTest
         FilesModel files = new FilesModel();
         files.SetFilesystem(fs);
         File file = files.AddSourceFile(new Uri("file:///path/to/test/file.ext"));
-        
+
         files.RunRules(rules);
-        
+
         Assert.Equal("/path/to/file.ext", file.Destination);
     }
 }

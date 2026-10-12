@@ -1,4 +1,6 @@
-namespace JBRenamer.Rules;
+using System.IO;
+
+namespace JBRenamer.Rules.Type;
 
 public class PrefixRule : Rule
 {

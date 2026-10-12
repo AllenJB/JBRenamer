@@ -1,6 +1,4 @@
-using System.ComponentModel;
 using System.Diagnostics;
-using Qt.Bridge.Models;
 
 namespace JBRenamer;
 

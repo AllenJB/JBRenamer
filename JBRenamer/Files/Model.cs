@@ -1,17 +1,22 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Abstractions;
 using System.Web;
+using JBRenamer.Filters;
 using Qt.Bridge.Models;
 using Qt.DotNet;
 using Testably.Abstractions;
+using RulesModel = JBRenamer.Rules.Model;
 
 [assembly: Qt.IgnoreType(typeof(IFileSystem))]
 [assembly: Qt.IgnoreType(typeof(IFileSystemInfo))]
 
-namespace JBRenamer;
+namespace JBRenamer.Files;
 
-public class FilesModel : TableModel<string>, INotifyPropertyChanged
+public class Model : TableModel<string>, INotifyPropertyChanged
 {
     private IFileSystem Filesystem = new RealFileSystem();
 
@@ -120,7 +125,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         throw new InvalidOperationException("Not a valid file or directory path: " + path);
     }
 
-    private void AddFSInfoRecursive(IFileSystemInfo newEntry, FiltersModel fileFilters, bool isRootLevel = false)
+    private void AddFSInfoRecursive(IFileSystemInfo newEntry, FilterSettings fileFilters, bool isRootLevel = false)
     {
         if (! newEntry.Exists)
         {
@@ -181,7 +186,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
     }
 
-    private void AddFileInfos(List<IFileSystemInfo> newFiles, FiltersModel? fileFilters = null)
+    private void AddFileInfos(List<IFileSystemInfo> newFiles, FilterSettings? fileFilters = null)
     {
         int currentLastIndex = (Files.Count - 1);
         BeginInsertRows(new ModelIndex(), currentLastIndex, currentLastIndex + newFiles.Count);
@@ -201,7 +206,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         Debug.WriteLine("Total files: " + Files.Count);
     }
 
-    public void AddURIs(List<Uri> selectedFiles, FiltersModel? fileFilters = null)
+    public void AddURIs(List<Uri> selectedFiles, FilterSettings? fileFilters = null)
     {
         List<IFileSystemInfo> newFiles = [];
         List<string> invalidURIs = [];
@@ -279,7 +284,7 @@ public class FilesModel : TableModel<string>, INotifyPropertyChanged
         }
     }
 
-    public void Drop(string items, FiltersModel fileFilters)
+    public void Drop(string items, FilterSettings fileFilters)
     {
         Debug.WriteLine("Items: " + items);
         // TODO Update to obey file filters

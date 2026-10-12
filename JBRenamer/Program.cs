@@ -1,10 +1,17 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Abstractions;
 using System.Xml.Serialization;
+using JBRenamer.Filters;
 using JBRenamer.Presets;
+using JBRenamer.Rules.Type;
 using Qt.Quick;
 using Testably.Abstractions;
+using FilesModel = JBRenamer.Files.Model;
+using RulesModel = JBRenamer.Rules.Model;
 
 namespace JBRenamer;
 
@@ -18,7 +25,7 @@ public class Program
 
     public FilesModel Files = new();
 
-    public FiltersModel Filters = new();
+    public FilterSettings Filters = new();
 
     public ObservableCollection<Preset> Presets = new();
 
@@ -112,7 +119,7 @@ public class Program
     public void PresetAdd(string name, bool includeFilters)
     {
         Debug.WriteLine("Add new preset: " + name);
-        FiltersModel? presetFilters = null;
+        FilterSettings? presetFilters = null;
         if (includeFilters)
         {
             presetFilters = Filters.Clone();

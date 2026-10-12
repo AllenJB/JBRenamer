@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace JBRenamer;
+namespace JBRenamer.Filters;
 
-public class FiltersModel : INotifyPropertyChanged
+public class FilterSettings : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -15,9 +15,9 @@ public class FiltersModel : INotifyPropertyChanged
         }
     }
 
-    public FiltersModel Clone()
+    public FilterSettings Clone()
     {
-        return (FiltersModel)MemberwiseClone();
+        return (FilterSettings)MemberwiseClone();
     }
 
     public bool ItemsInFolders = false;
@@ -60,7 +60,7 @@ public class FiltersModel : INotifyPropertyChanged
         NotifyPropertyChanged();
     }
 
-    public void Load(FiltersModel saved)
+    public void Load(FilterSettings saved)
     {
         SetItemsInFolders(saved.ItemsInFolders);
         SetFoldersAsItems(saved.FoldersAsItems);

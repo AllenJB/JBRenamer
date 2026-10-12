@@ -1,13 +1,14 @@
-using JBRenamer;
+using JBRenamer.Filters;
 using Testably.Abstractions.Helpers;
 using Testably.Abstractions.Testing;
 using Testably.Abstractions.Testing.FileSystem;
 using Testably.Abstractions.Testing.Initializer;
 using Xunit.Abstractions;
 using Xunit.Sdk;
-using File = JBRenamer.File;
+using File = JBRenamer.Files.File;
+using FilesModel = JBRenamer.Files.Model;
 
-namespace Tests;
+namespace Tests.Filters;
 
 public class DefaultUnixFileModeStrategy : IUnixFileModeStrategy
 {
@@ -39,8 +40,8 @@ public class DefaultUnixFileModeStrategy : IUnixFileModeStrategy
         UnixFileMode mode, FileAccess requestedAccess)
     {
         UserGroup owner = extensibility
-                              .RetrieveMetadata<UserGroup>(nameof(DefaultUnixFileModeStrategy))
-                          ?? new UserGroup(CurrentUser, CurrentGroup);
+                .RetrieveMetadata<UserGroup>(nameof(DefaultUnixFileModeStrategy))
+            ?? new UserGroup(CurrentUser, CurrentGroup);
 
         bool readOk =
             mode.HasFlag(UnixFileMode.OtherRead) ||
@@ -104,7 +105,7 @@ public class FiltersTest
         strategy.SimulateUser("user1").SimulateGroup("group1");
         return fs;
     }
-    
+
     private string DropListForTopLevel(string basePath)
     {
         string[] topEntries =
@@ -141,6 +142,7 @@ public class FiltersTest
             {
                 Assert.Contains(expected, uris);
             }
+
             Assert.Equal(expectedContains.Length, files.Count());
         }
         catch (XunitException)
@@ -156,7 +158,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = false,
@@ -188,7 +190,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = false,
             IncludeHidden = true,
@@ -203,14 +205,14 @@ public class FiltersTest
 
         AssertFileList([basePath], files, basePath);
     }
-    
+
     [Fact]
     public void TestBasePathWithoutFoldersAsItems()
     {
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -233,14 +235,14 @@ public class FiltersTest
         ];
         AssertFileList(expectedContains, files, basePath);
     }
-    
+
     [Fact]
     public void TestBasePathWithoutIncludeSubfolders()
     {
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -268,7 +270,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -297,12 +299,13 @@ public class FiltersTest
         AssertFileList(expectedContains, files, basePath);
     }
 
-    [Fact] public void TestBasePathWithAllEnabled()
+    [Fact]
+    public void TestBasePathWithAllEnabled()
     {
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -336,7 +339,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -361,14 +364,14 @@ public class FiltersTest
         ];
         AssertFileList(expectedContains, files, basePath);
     }
-    
+
     [Fact]
     public void TestTopLevelWithoutItemsInFolders()
     {
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = false,
             IncludeHidden = true,
@@ -401,7 +404,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = false,
@@ -432,7 +435,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -463,7 +466,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -493,7 +496,7 @@ public class FiltersTest
         string basePath = "/path/to/test";
         MockFileSystem fs = CreateFileSystem(basePath);
 
-        FiltersModel fileFilters = new FiltersModel
+        FilterSettings fileFilters = new FilterSettings
         {
             ItemsInFolders = true,
             IncludeHidden = true,
@@ -521,5 +524,4 @@ public class FiltersTest
         ];
         AssertFileList(expectedContains, files, basePath);
     }
-
 }

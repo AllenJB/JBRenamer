@@ -1,3 +1,5 @@
+using System;
+
 namespace JBRenamer;
 
 public class ShowErrorArgs : EventArgs

@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
+using JBRenamer.Rules.Type;
 using Qt.Bridge.Models;
+using RulesModel = JBRenamer.Rules.Model;
 
-namespace JBRenamer;
+namespace JBRenamer.Files;
 
 public enum FileStatus
 {

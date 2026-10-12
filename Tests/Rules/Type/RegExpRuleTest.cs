@@ -1,6 +1,6 @@
-using JBRenamer.Rules;
+using JBRenamer.Rules.Type;
 
-namespace Tests.Rules;
+namespace Tests.Rules.Type;
 
 public class RegExpRuleTest
 {

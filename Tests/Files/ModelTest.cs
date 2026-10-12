@@ -1,12 +1,14 @@
 using System.IO.Abstractions;
-using JBRenamer;
+using JBRenamer.Files;
 using Testably.Abstractions.Testing;
 using Testably.Abstractions.Testing.Initializer;
-using File = JBRenamer.File;
+using File = JBRenamer.Files.File;
+using FilesModel = JBRenamer.Files.Model;
+using RulesModel = JBRenamer.Rules.Model;
 
-namespace Tests;
+namespace Tests.Files;
 
-public class FilesModelTest
+public class ModelTest
 {
     [Fact]
     public void DetectDestinationConflictsTest()
@@ -24,9 +26,9 @@ public class FilesModelTest
         files.SetFilesystem(fs);
         File fileA = files.AddSourceFile(new Uri("file:///path/to/test/filename.txt"));
         File fileB = files.AddSourceFile(new Uri("file:///path/to/test/filename.with.dots.txt"));
-        
+
         files.RunRules(rules);
-        
+
         Assert.Equal(FileStatus.Conflict, fileA.Status);
         Assert.Equal(FileStatus.Conflict, fileB.Status);
     }
