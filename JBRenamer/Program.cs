@@ -138,6 +138,25 @@ public class Program
         PresetSave(preset);
     }
 
+    public string PresetValidateName(string name)
+    {
+        var disallowed = new[] { Path.DirectorySeparatorChar, '*', '.', '?' };
+        if (disallowed.Any(c => name.Contains(c)))
+        {
+            return "Preset name cannot contain the following characters: " + String.Join(" ", disallowed);
+        }
+        
+        foreach (Preset preset in Presets)
+        {
+            if (preset.Name == name)
+            {
+                return "Another preset with the same name already exists";
+            }
+        }
+
+        return "";
+    }
+
     public void PresetLoad(Preset preset)
     {
         Rules.Load(preset.Rules);
