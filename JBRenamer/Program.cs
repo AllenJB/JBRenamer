@@ -93,6 +93,15 @@ public class Program
         ConfigDir = configPath;
     }
 
+    public string? GetConfigFile()
+    {
+        if (ConfigDir == null)
+        {
+            return null;
+        }
+        return ConfigDir + "jbrenamer.conf";
+    }
+
     private void PresetSave(Preset preset)
     {
         if (ConfigDir == null)

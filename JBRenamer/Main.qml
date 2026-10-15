@@ -17,6 +17,7 @@ ApplicationWindow {
     height: 600
 
     Settings {
+        location: "file://" + program.getConfigFile()
         category: "window"
         property alias x: mainWindow.x
         property alias y: mainWindow.y
