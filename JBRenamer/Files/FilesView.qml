@@ -203,18 +203,20 @@ DropArea {
                 // @formatter:on
 
                 MenuItem {
-                    text: "X Clear file list"
+                    text: "Clear file list"
                     onTriggered: {
                         program.files.clear();
                         program.fileListUpdated();
                     }
                 }
+                /*
                 MenuItem {
                     text: "Row: " + rowContextMenu.triggerItem.row + ", " + rowContextMenu.triggerItem.column + " = " + rowContextMenu.triggerItem.model.display
                     onTriggered: {
                         console.log(rowContextMenu.triggerItem)
                     }
                 }
+                 */
                 MenuItem {
                     enabled: fileSelection.hasSelection
                     text: "Remove selected items"

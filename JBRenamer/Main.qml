@@ -33,9 +33,6 @@ ApplicationWindow {
 
         onRuleListUpdated: function() {
             program.files.runRules(program.rules);
-            Qt.callLater(function () {
-                rulesTable.forceLayout();
-            });
         }
     }
 

@@ -6,6 +6,16 @@ import QtQuick.Dialogs
 ColumnLayout {
     id: rulesTableContainer
 
+    Connections {
+        target: program
+        
+        onRuleListUpdated: function() {
+            Qt.callLater(function () {
+                rulesTable.forceLayout();
+            });
+        }
+    }
+
     HorizontalHeaderView {
         syncView: rulesTable
         Layout.row: 1
@@ -50,5 +60,20 @@ ColumnLayout {
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AlwaysOn
         }
+
+        ContextMenu.menu: Menu {
+            MenuItem {
+                text: "Add rule"
+                onTriggered: ruleAddDialog.open()
+            }
+            MenuItem {
+                text: "Clear rule list"
+                onTriggered: {
+                    program.rules.clear();
+                    program.ruleListUpdated();
+                }
+            }
+        }
+
     }
 }
