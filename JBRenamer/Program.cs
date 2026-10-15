@@ -47,6 +47,26 @@ public class Program
         SetupConfigDir();
         Files.ShowError += ProxyShowError;
         PresetsRestore();
+
+        string lastOpenPreset = ConfigDir + "Last Open";
+        if (Filesystem.File.Exists(lastOpenPreset))
+        {
+            XmlSerializer serializer = new(typeof(Preset));
+            FileSystemStream file = Filesystem.FileStream.New(lastOpenPreset, FileMode.Open);
+            Preset? preset = (Preset?)serializer.Deserialize(file);
+            if (preset is { Filters: not null })
+            {
+                Filters.Load(preset.Filters);
+                Rules.Load(preset.Rules);
+            }
+        }
+    }
+
+    public void OnClosing()
+    {
+        Preset lastOpen = new Preset("Last Open", Rules.Rules, Filters);
+        lastOpen.IsLastOpen = true;
+        PresetSave(lastOpen);
     }
 
     private void SetupConfigDir()
@@ -80,7 +100,7 @@ public class Program
             return;
         }
 
-        string presetsPath = ConfigDir + "presets" + Path.DirectorySeparatorChar;
+        string presetsPath = ConfigDir + (preset.IsLastOpen ? "" : "presets" + Path.DirectorySeparatorChar);
         if (! Filesystem.Directory.Exists(presetsPath))
         {
             Filesystem.Directory.CreateDirectory(presetsPath);

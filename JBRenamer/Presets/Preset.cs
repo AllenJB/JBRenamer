@@ -12,6 +12,8 @@ public class Preset
 
     public FilterSettings? Filters;
 
+    public bool IsLastOpen = false;
+
     [XmlArrayItem(Type = typeof(ReplaceRule)),
      XmlArrayItem(Type = typeof(PrefixRule)),
      XmlArrayItem(Type = typeof(RegExpRule))]

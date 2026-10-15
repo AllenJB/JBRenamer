@@ -28,7 +28,9 @@ ApplicationWindow {
         id: program
 
         signal fileListUpdated()
+
         signal ruleListUpdated()
+
         signal filtersUpdated()
 
         onShowError: function (args) {
@@ -40,9 +42,13 @@ ApplicationWindow {
             program.files.runRules(program.rules);
         }
 
-        onRuleListUpdated: function() {
+        onRuleListUpdated: function () {
             program.files.runRules(program.rules);
         }
+    }
+
+    onClosing: function () {
+        program.onClosing();
     }
 
     DebugModel {
@@ -108,9 +114,12 @@ ApplicationWindow {
             }
         }
 
-        Files.Menu {}
-        Rules.Menu {}
-        Presets.Menu {}
+        Files.Menu {
+        }
+        Rules.Menu {
+        }
+        Presets.Menu {
+        }
     }
 
     footer: StatusBar {
