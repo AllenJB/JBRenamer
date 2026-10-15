@@ -94,64 +94,16 @@ ApplicationWindow {
 
     menuBar: MenuBar {
         Menu {
-            title: qsTr("&File")
+            title: "App"
 
             Action {
-                text: "Configure file filters"
-                onTriggered: {
-                    filtersDialog.open()
-                }
-            }
-            Action {
-                text: "Add Source File(s)"
-                onTriggered: {
-                    addSourceFileDialog.open()
-                }
-            }
-            Action {
-                text: "Add Source Files From Directory"
-                onTriggered: {
-                    addSourceDirDialog.open()
-                }
-            }
-            Action {
-                text: "Rename files"
-                onTriggered: {
-                    program.files.renameFiles(program.rules);
-                    program.fileListUpdated();
-                }
-            }
-            Action {
-                text: "Clear File List"
-                onTriggered: {
-                    program.files.clear();
-                    program.fileListUpdated();
-                }
-            }
-            Action {
-                text: qsTr("&Quit")
+                text: "&Quit"
                 onTriggered: mainWindow.close()
             }
         }
 
-        Menu {
-            title: "Rules"
-
-            Action {
-                text: "Add Rule"
-                onTriggered: {
-                    ruleAddDialog.open()
-                }
-            }
-            Action {
-                text: "Clear Rule List"
-                onTriggered: {
-                    program.rules.clear();
-                    program.ruleListUpdated();
-                }
-            }
-        }
-
+        Files.Menu {}
+        Rules.Menu {}
         Presets.Menu {}
     }
 
