@@ -8,8 +8,8 @@ ColumnLayout {
 
     Connections {
         target: program
-        
-        onRuleListUpdated: function() {
+
+        function onRuleListUpdated() {
             Qt.callLater(function () {
                 rulesTable.forceLayout();
             });

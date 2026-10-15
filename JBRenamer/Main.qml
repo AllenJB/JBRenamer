@@ -2,6 +2,7 @@
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtCore
 // The ../ is required here because that's how the files end up laid out in the bin/Debug/net10.0/ directory
 import "../Files" as Files
 import "../Filters" as Filters
@@ -14,6 +15,14 @@ ApplicationWindow {
     title: "JBRenamer"
     width: 800
     height: 600
+
+    Settings {
+        category: "window"
+        property alias x: mainWindow.x
+        property alias y: mainWindow.y
+        property alias width: mainWindow.width
+        property alias height: mainWindow.height
+    }
 
     Program {
         id: program

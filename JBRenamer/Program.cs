@@ -33,6 +33,11 @@ public class Program
 
     internal static void Main(string[] args)
     {
+        Qt.Application.Name = "JBRenamer";
+        Qt.Application.DisplayName = "JBRenamer";
+        Qt.Application.OrganizationName = "AllenJB";
+        Qt.Application.OrganizationDomain = "allenjb.uk";
+        
         Qml.LoadFromRootModule("Main");
         Qml.WaitForExit();
     }
